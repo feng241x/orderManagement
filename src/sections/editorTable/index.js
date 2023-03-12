@@ -1,235 +1,206 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Close';
-import {
-  GridRowsProp,
-  GridRowModesModel,
-  GridRowModes,
-  DataGridPro,
-  GridColumns,
-  GridRowParams,
-  MuiEvent,
-  GridToolbarContainer,
-  GridActionsCellItem,
-  GridEventListener,
-  GridRowId,
-  GridRowModel,
-} from '@mui/x-data-grid-pro';
+import { DataGrid, GridCellModes } from '@mui/x-data-grid';
 import {
   randomCreatedDate,
   randomTraderName,
   randomUpdatedDate,
-  randomId,
 } from '@mui/x-data-grid-generator';
 
-const initialRows: GridRowsProp = [
+function EditToolbar(props) {
+  const { selectedCellParams, cellMode, cellModesModel, setCellModesModel } = props;
+
+  const handleSaveOrEdit = () => {
+    if (!selectedCellParams) {
+      return;
+    }
+    const { id, field } = selectedCellParams;
+    if (cellMode === 'edit') {
+      setCellModesModel({
+        ...cellModesModel,
+        [id]: { ...cellModesModel[id], [field]: { mode: GridCellModes.View } },
+      });
+    } else {
+      setCellModesModel({
+        ...cellModesModel,
+        [id]: { ...cellModesModel[id], [field]: { mode: GridCellModes.Edit } },
+      });
+    }
+  };
+
+  const handleCancel = () => {
+    if (!selectedCellParams) {
+      return;
+    }
+    const { id, field } = selectedCellParams;
+    setCellModesModel({
+      ...cellModesModel,
+      [id]: {
+        ...cellModesModel[id],
+        [field]: { mode: GridCellModes.View, ignoreModifications: true },
+      },
+    });
+  };
+
+  const handleMouseDown = (event) => {
+    // Keep the focus in the cell
+    event.preventDefault();
+  };
+
+  return (
+    <Box
+      sx={{
+        borderBottom: 1,
+        borderColor: 'divider',
+        p: 1,
+      }}
+    >
+      <Button
+        onClick={handleSaveOrEdit}
+        onMouseDown={handleMouseDown}
+        disabled={!selectedCellParams}
+        variant="outlined"
+      >
+        {cellMode === 'edit' ? 'Save' : 'Edit'}
+      </Button>
+      <Button
+        onClick={handleCancel}
+        onMouseDown={handleMouseDown}
+        disabled={cellMode === 'view'}
+        variant="outlined"
+        sx={{ ml: 1 }}
+      >
+        Cancel
+      </Button>
+    </Box>
+  );
+}
+
+EditToolbar.propTypes = {
+  cellMode: PropTypes.oneOf(['edit', 'view']).isRequired,
+  cellModesModel: PropTypes.object.isRequired,
+  selectedCellParams: PropTypes.shape({
+    field: PropTypes.string.isRequired,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  }),
+  setCellModesModel: PropTypes.func.isRequired,
+};
+
+export default function StartEditButtonGrid() {
+  const [selectedCellParams, setSelectedCellParams] = React.useState(null);
+  const [cellModesModel, setCellModesModel] = React.useState({});
+
+  const handleCellFocus = React.useCallback((event) => {
+    const row = event.currentTarget.parentElement;
+    const id = row.dataset.id;
+    const field = event.currentTarget.dataset.field;
+    debugger;
+    setSelectedCellParams({ id, field });
+  }, []);
+
+  const cellMode = React.useMemo(() => {
+    debugger;
+    if (!selectedCellParams) {
+      return 'view';
+    }
+    const { id, field } = selectedCellParams;
+    return cellModesModel[id]?.[field]?.mode || 'view';
+  }, [cellModesModel, selectedCellParams]);
+
+  const handleCellKeyDown = React.useCallback(
+    (params, event) => {
+      debugger;
+      if (cellMode === 'edit') {
+        // Prevents calling event.preventDefault() if Tab is pressed on a cell in edit mode
+        event.defaultMuiPrevented = true;
+      }
+    },
+    [cellMode],
+  );
+
+  return (
+    <div style={{ height: 600, width: '100%' }}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        onCellKeyDown={handleCellKeyDown}
+        cellModesModel={cellModesModel}
+        onCellModesModelChange={(model) => setCellModesModel(model)}
+        slots={{
+          toolbar: EditToolbar,
+        }}
+        slotProps={{
+          toolbar: {
+            cellMode,
+            selectedCellParams,
+            setSelectedCellParams,
+            cellModesModel,
+            setCellModesModel,
+          },
+          cell: {
+            onFocus: handleCellFocus,
+          },
+        }}
+      />
+    </div>
+  );
+}
+
+const columns = [
+  { field: 'name', headerName: 'Name', width: 180, editable: true },
+  { field: 'age', headerName: 'Age', type: 'number', editable: true },
   {
-    id: randomId(),
+    field: 'dateCreated',
+    headerName: 'Date Created',
+    type: 'date',
+    width: 180,
+    editable: true,
+  },
+  {
+    field: 'lastLogin',
+    headerName: 'Last Login',
+    type: 'dateTime',
+    width: 220,
+    editable: true,
+  },
+];
+
+const rows = [
+  {
+    id: 1,
     name: randomTraderName(),
     age: 25,
     dateCreated: randomCreatedDate(),
     lastLogin: randomUpdatedDate(),
   },
   {
-    id: randomId(),
+    id: 2,
     name: randomTraderName(),
     age: 36,
     dateCreated: randomCreatedDate(),
     lastLogin: randomUpdatedDate(),
   },
   {
-    id: randomId(),
+    id: 3,
     name: randomTraderName(),
     age: 19,
     dateCreated: randomCreatedDate(),
     lastLogin: randomUpdatedDate(),
   },
   {
-    id: randomId(),
+    id: 4,
     name: randomTraderName(),
     age: 28,
     dateCreated: randomCreatedDate(),
     lastLogin: randomUpdatedDate(),
   },
   {
-    id: randomId(),
+    id: 5,
     name: randomTraderName(),
     age: 23,
     dateCreated: randomCreatedDate(),
     lastLogin: randomUpdatedDate(),
   },
 ];
-
-interface EditToolbarProps {
-  setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-  setRowModesModel: (
-    newModel: (oldModel: GridRowModesModel) => GridRowModesModel,
-  ) => void;
-}
-
-function EditToolbar(props: EditToolbarProps) {
-  const { setRows, setRowModesModel } = props;
-
-  const handleClick = () => {
-    const id = randomId();
-    setRows((oldRows) => [...oldRows, { id, name: '', age: '', isNew: true }]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
-    }));
-  };
-
-  return (
-    <GridToolbarContainer>
-      <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        Add record
-      </Button>
-    </GridToolbarContainer>
-  );
-}
-
-export default function FullFeaturedCrudGrid() {
-  const [rows, setRows] = React.useState(initialRows);
-  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
-
-  const handleRowEditStart = (
-    params: GridRowParams,
-    event: MuiEvent<React.SyntheticEvent>,
-  ) => {
-    event.defaultMuiPrevented = true;
-  };
-
-  const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
-    event.defaultMuiPrevented = true;
-  };
-
-  const handleEditClick = (id: GridRowId) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-  };
-
-  const handleSaveClick = (id: GridRowId) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
-  };
-
-  const handleDeleteClick = (id: GridRowId) => () => {
-    setRows(rows.filter((row) => row.id !== id));
-  };
-
-  const handleCancelClick = (id: GridRowId) => () => {
-    setRowModesModel({
-      ...rowModesModel,
-      [id]: { mode: GridRowModes.View, ignoreModifications: true },
-    });
-
-    const editedRow = rows.find((row) => row.id === id);
-    if (editedRow!.isNew) {
-      setRows(rows.filter((row) => row.id !== id));
-    }
-  };
-
-  const processRowUpdate = (newRow: GridRowModel) => {
-    const updatedRow = { ...newRow, isNew: false };
-    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-    return updatedRow;
-  };
-
-  const columns: GridColumns = [
-    { field: 'name', headerName: 'Name', width: 180, editable: true },
-    { field: 'age', headerName: 'Age', type: 'number', editable: true },
-    {
-      field: 'dateCreated',
-      headerName: 'Date Created',
-      type: 'date',
-      width: 180,
-      editable: true,
-    },
-    {
-      field: 'lastLogin',
-      headerName: 'Last Login',
-      type: 'dateTime',
-      width: 220,
-      editable: true,
-    },
-    {
-      field: 'actions',
-      type: 'actions',
-      headerName: 'Actions',
-      width: 100,
-      cellClassName: 'actions',
-      getActions: ({ id }) => {
-        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-        if (isInEditMode) {
-          return [
-            <GridActionsCellItem
-              icon={<SaveIcon />}
-              label="Save"
-              onClick={handleSaveClick(id)}
-            />,
-            <GridActionsCellItem
-              icon={<CancelIcon />}
-              label="Cancel"
-              className="textPrimary"
-              onClick={handleCancelClick(id)}
-              color="inherit"
-            />,
-          ];
-        }
-
-        return [
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Edit"
-            className="textPrimary"
-            onClick={handleEditClick(id)}
-            color="inherit"
-          />,
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={handleDeleteClick(id)}
-            color="inherit"
-          />,
-        ];
-      },
-    },
-  ];
-
-  return (
-    <Box
-      sx={{
-        height: 500,
-        width: '100%',
-        '& .actions': {
-          color: 'text.secondary',
-        },
-        '& .textPrimary': {
-          color: 'text.primary',
-        },
-      }}
-    >
-      <DataGridPro
-        rows={rows}
-        columns={columns}
-        editMode="row"
-        rowModesModel={rowModesModel}
-        onRowModesModelChange={(newModel) => setRowModesModel(newModel)}
-        onRowEditStart={handleRowEditStart}
-        onRowEditStop={handleRowEditStop}
-        processRowUpdate={processRowUpdate}
-        components={{
-          Toolbar: EditToolbar,
-        }}
-        componentsProps={{
-          toolbar: { setRows, setRowModesModel },
-        }}
-        experimentalFeatures={{ newEditingApi: true }}
-      />
-    </Box>
-  );
-}
