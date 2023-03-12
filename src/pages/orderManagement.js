@@ -10,7 +10,7 @@ import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { OrderTable } from "src/sections/orderTable/order-table";
 import { OrderSearch } from "src/sections/orderTable/order-search";
 import { applyPagination } from "src/utils/apply-pagination";
-
+import StartEditButtonGrid from "../sections/editorTable"
 const now = new Date();
 
 const data = [
@@ -235,21 +235,11 @@ const Page = () => {
                 >
                   新增
                 </Button>
-                <Button
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <PlusIcon />
-                    </SvgIcon>
-                  }
-                  variant="outlined"
-                >
-                  编辑
-                </Button>
               </div>
             </Stack>
             <OrderSearch />
-
-            <OrderTable
+            <StartEditButtonGrid />
+            {/* <OrderTable
               count={data.length}
               items={customers}
               onDeselectAll={customersSelection.handleDeselectAll}
@@ -261,7 +251,7 @@ const Page = () => {
               page={page}
               rowsPerPage={rowsPerPage}
               selected={customersSelection.selected}
-            />
+            /> */}
           </Stack>
         </Container>
       </Box>

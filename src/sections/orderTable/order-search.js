@@ -14,7 +14,7 @@ export const OrderSearch = () => (
           </SvgIcon>
         </InputAdornment>
       }
-      sx={{ maxWidth: 200 }}
+      sx={{ maxWidth: 300 }}
     />
   </Card>
 );
