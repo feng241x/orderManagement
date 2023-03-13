@@ -117,7 +117,7 @@ const Page = () => {
                   </Typography>
                 )}
                 <Button fullWidth size="large" sx={{ mt: 3 }} type="submit" variant="contained">
-                  Continue
+                  登录
                 </Button>
                 {/* <Alert color="primary" severity="info" sx={{ mt: 3 }}>
                   <div>
