@@ -10,7 +10,7 @@ import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { OrderTable } from "src/sections/orderTable/order-table";
 import { OrderSearch } from "src/sections/orderTable/order-search";
 import { applyPagination } from "src/utils/apply-pagination";
-import ServerPaginationGrid from "../sections/editorTable";
+import ServerPaginationGrid from "../sections/editorTable/index.js";
 const now = new Date();
 
 const data = [

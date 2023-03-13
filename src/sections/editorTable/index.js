@@ -2,21 +2,28 @@ import * as React from "react";
 import { useEffect } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import { DataGrid, zhCN } from "@mui/x-data-grid";
-import { createFakeServer } from "@mui/x-data-grid-generator";
 import Mock from "mockjs";
-
+import Button from "@mui/material/Button";
 import {
-  DataGridPremium,
-  GridToolbar,
-  useGridApiRef,
-  useKeepGroupedColumnsHidden,
-} from "@mui/x-data-grid-premium";
+  zhCN,
+  DataGrid,
+  GridToolbarContainer,
+  GridToolbarColumnsButton,
+  GridToolbarFilterButton,
+  GridToolbarExport,
+  GridToolbarDensitySelector,
+} from "@mui/x-data-grid";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+
 const Random = Mock.Random;
 const SERVER_OPTIONS = {
   useCursorPagination: false,
 };
-const { useQuery, ...data } = createFakeServer({}, SERVER_OPTIONS);
 const columnsFields = [
   {
     field: "id",
@@ -93,18 +100,8 @@ const useFakeMutation = () => {
 };
 
 export default function ServerPaginationGrid() {
-  const [paginationModel, setPaginationModel] = React.useState({
-    page: 1,
-    pageSize: 25,
-  });
-  const { isLoading, rows, pageInfo } = useQuery(paginationModel);
-  const [rowCountState, setRowCountState] = React.useState(pageInfo?.totalRowCount || 0);
-  React.useEffect(() => {
-    setRowCountState((prevRowCountState) =>
-      pageInfo?.totalRowCount !== undefined ? pageInfo?.totalRowCount : prevRowCountState
-    );
-  }, [pageInfo?.totalRowCount, setRowCountState]);
-
+  // 新增订单弹窗状态管理
+  const [openDialog, setOpenDialog] = React.useState(false);
   const [rowsData, setRowsData] = React.useState([]);
   const mutateRow = useFakeMutation();
 
@@ -130,7 +127,7 @@ export default function ServerPaginationGrid() {
   useEffect(() => {
     // mock 数据
     const rows = Mock.mock({
-      "list|20000-100000": [
+      "list|200-1000": [
         {
           "id|+1": 1,
           "aliId|+1": Random.integer(1000),
@@ -164,15 +161,60 @@ export default function ServerPaginationGrid() {
     });
     setRowsData(rows.list);
   }, []);
+
+  const createRandomRow = () => {
+    let newData = {};
+    columnsFields.forEach((item, index) => {
+      newData[item["field"]] = item["field"] === "id" ? "-1" : "";
+    });
+    return newData;
+  };
+
+  const CustomToolbar = () => {
+    return (
+      <GridToolbarContainer>
+        <Button size="small" onClick={handleAddRow}>
+          新增订单
+        </Button>
+        <GridToolbarColumnsButton />
+        <GridToolbarFilterButton />
+        <GridToolbarDensitySelector />
+        <GridToolbarExport
+          printOptions={{
+            disableToolbarButton: true,
+          }}
+        />
+      </GridToolbarContainer>
+    );
+  };
+
+  // 打开新建弹窗
+  const handleAddRow = () => {
+    setOpenDialog(true);
+  };
+
+  // 关闭弹窗
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
   return (
     <div style={{ height: 550, width: "100%" }}>
       <DataGrid
+        dataSet="Commodity"
+        sx={{
+          boxShadow: 2,
+          border: 2,
+          borderColor: "primary.light",
+          "& .MuiDataGrid-cell:hover": {
+            color: "primary.main",
+          },
+        }}
         localeText={zhCN.components.MuiDataGrid.defaultProps.localeText}
         checkboxSelection
         rows={rowsData}
         columns={columns}
         // rowCount={rowCountState}
-        loading={isLoading}
         initialState={{
           pagination: {
             paginationModel: {
@@ -181,13 +223,65 @@ export default function ServerPaginationGrid() {
           },
         }}
         pageSizeOptions={[25, 50, 100]}
-        // paginationModel={paginationModel}
-        // paginationMode="server"
-        onPaginationModelChange={setPaginationModel}
         processRowUpdate={processRowUpdate}
         onProcessRowUpdateError={handleProcessRowUpdateError}
-        slots={{ toolbar: GridToolbar }}
+        slots={{ toolbar: CustomToolbar }}
       />
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>新建订单</DialogTitle>
+        <DialogContent>
+          <DialogContentText>请输入订单详细信息.</DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="订单编号"
+            type="email"
+            fullWidth
+            variant="standard"
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="订单编号"
+            type="email"
+            fullWidth
+            variant="standard"
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="订单编号"
+            type="email"
+            fullWidth
+            variant="standard"
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="订单编号"
+            type="email"
+            fullWidth
+            variant="standard"
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="订单编号"
+            type="email"
+            fullWidth
+            variant="standard"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>取消</Button>
+          <Button onClick={handleCloseDialog}>提交</Button>
+        </DialogActions>
+      </Dialog>
       {!!snackbar && (
         <Snackbar
           open
