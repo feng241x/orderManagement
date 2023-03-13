@@ -5,6 +5,13 @@ import Alert from "@mui/material/Alert";
 import { DataGrid, zhCN } from "@mui/x-data-grid";
 import { createFakeServer } from "@mui/x-data-grid-generator";
 import Mock from "mockjs";
+
+import {
+  DataGridPremium,
+  GridToolbar,
+  useGridApiRef,
+  useKeepGroupedColumnsHidden,
+} from "@mui/x-data-grid-premium";
 const Random = Mock.Random;
 const SERVER_OPTIONS = {
   useCursorPagination: false,
@@ -85,8 +92,7 @@ const useFakeMutation = () => {
   );
 };
 
-export default function ServerPaginationGrid(props) {
-  const { addRowHandle } = props;
+export default function ServerPaginationGrid() {
   const [paginationModel, setPaginationModel] = React.useState({
     page: 1,
     pageSize: 25,
@@ -158,7 +164,6 @@ export default function ServerPaginationGrid(props) {
     });
     setRowsData(rows.list);
   }, []);
-
   return (
     <div style={{ height: 550, width: "100%" }}>
       <DataGrid
@@ -181,6 +186,7 @@ export default function ServerPaginationGrid(props) {
         onPaginationModelChange={setPaginationModel}
         processRowUpdate={processRowUpdate}
         onProcessRowUpdateError={handleProcessRowUpdateError}
+        slots={{ toolbar: GridToolbar }}
       />
       {!!snackbar && (
         <Snackbar

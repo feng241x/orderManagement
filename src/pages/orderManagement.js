@@ -225,7 +225,7 @@ const Page = () => {
                   </Button>
                 </Stack>
               </Stack>
-              <div>
+              {/* <div>
                 <Button
                   sx={{ mr: 2 }}
                   startIcon={
@@ -238,10 +238,9 @@ const Page = () => {
                 >
                   新增
                 </Button>
-              </div>
+              </div> */}
             </Stack>
-            <OrderSearch />
-            <ServerPaginationGrid addRowHandle={addRowHandle} />
+            <ServerPaginationGrid />
             {/* <OrderTable
               count={data.length}
               items={customers}
