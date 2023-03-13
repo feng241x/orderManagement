@@ -10,7 +10,7 @@ import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { OrderTable } from "src/sections/orderTable/order-table";
 import { OrderSearch } from "src/sections/orderTable/order-search";
 import { applyPagination } from "src/utils/apply-pagination";
-import StartEditButtonGrid from "../sections/editorTable"
+import ServerPaginationGrid from "../sections/editorTable";
 const now = new Date();
 
 const data = [
@@ -183,6 +183,8 @@ const Page = () => {
     setRowsPerPage(event.target.value);
   }, []);
 
+  const addRowHandle = () => {};
+
   return (
     <>
       <Head>
@@ -231,6 +233,7 @@ const Page = () => {
                       <PlusIcon />
                     </SvgIcon>
                   }
+                  onClick={addRowHandle}
                   variant="contained"
                 >
                   新增
@@ -238,7 +241,7 @@ const Page = () => {
               </div>
             </Stack>
             <OrderSearch />
-            <StartEditButtonGrid />
+            <ServerPaginationGrid addRowHandle={addRowHandle} />
             {/* <OrderTable
               count={data.length}
               items={customers}

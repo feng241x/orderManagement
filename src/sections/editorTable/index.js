@@ -1,206 +1,197 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import { DataGrid, GridCellModes } from '@mui/x-data-grid';
-import {
-  randomCreatedDate,
-  randomTraderName,
-  randomUpdatedDate,
-} from '@mui/x-data-grid-generator';
+import * as React from "react";
+import { useEffect } from "react";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import { DataGrid, zhCN } from "@mui/x-data-grid";
+import { createFakeServer } from "@mui/x-data-grid-generator";
+import Mock from "mockjs";
+const Random = Mock.Random;
+const SERVER_OPTIONS = {
+  useCursorPagination: false,
+};
+const { useQuery, ...data } = createFakeServer({}, SERVER_OPTIONS);
+const columnsFields = [
+  {
+    field: "id",
+    title: "平台单号",
+    minWidth: 100,
+  },
+  {
+    field: "aliId",
+    title: "支付宝账号",
+  },
+  {
+    field: "aliuserName",
+    title: "支付宝户主",
+  },
+  {
+    field: "platform",
+    title: "平台账号",
+  },
+  {
+    field: "'wechatAccount'",
+    title: "微信号",
+  },
+  {
+    field: "trackingNumber",
+    title: "物流单号",
+  },
+  {
+    field: "promotedProducts",
+    title: "推广产品",
+    editable: true,
+  },
+  {
+    field: "recoveryState",
+    title: "回收状态",
+    editable: true,
+  },
+  {
+    field: "refundState",
+    title: "返款状态",
+    editable: true,
+  },
+  {
+    field: "promoter",
+    title: "推广人",
+  },
+  {
+    field: "createTime",
+    title: "创建时间",
+  },
+];
 
-function EditToolbar(props) {
-  const { selectedCellParams, cellMode, cellModesModel, setCellModesModel } = props;
+const columns = columnsFields.map((item) => ({
+  field: item.field,
+  headerName: item.title,
+  minWidth: item.minWidth || 150,
+  type: item.type,
+  editable: item.editable || false,
+}));
 
-  const handleSaveOrEdit = () => {
-    if (!selectedCellParams) {
-      return;
-    }
-    const { id, field } = selectedCellParams;
-    if (cellMode === 'edit') {
-      setCellModesModel({
-        ...cellModesModel,
-        [id]: { ...cellModesModel[id], [field]: { mode: GridCellModes.View } },
-      });
-    } else {
-      setCellModesModel({
-        ...cellModesModel,
-        [id]: { ...cellModesModel[id], [field]: { mode: GridCellModes.Edit } },
-      });
-    }
-  };
-
-  const handleCancel = () => {
-    if (!selectedCellParams) {
-      return;
-    }
-    const { id, field } = selectedCellParams;
-    setCellModesModel({
-      ...cellModesModel,
-      [id]: {
-        ...cellModesModel[id],
-        [field]: { mode: GridCellModes.View, ignoreModifications: true },
-      },
-    });
-  };
-
-  const handleMouseDown = (event) => {
-    // Keep the focus in the cell
-    event.preventDefault();
-  };
-
-  return (
-    <Box
-      sx={{
-        borderBottom: 1,
-        borderColor: 'divider',
-        p: 1,
-      }}
-    >
-      <Button
-        onClick={handleSaveOrEdit}
-        onMouseDown={handleMouseDown}
-        disabled={!selectedCellParams}
-        variant="outlined"
-      >
-        {cellMode === 'edit' ? 'Save' : 'Edit'}
-      </Button>
-      <Button
-        onClick={handleCancel}
-        onMouseDown={handleMouseDown}
-        disabled={cellMode === 'view'}
-        variant="outlined"
-        sx={{ ml: 1 }}
-      >
-        Cancel
-      </Button>
-    </Box>
+const useFakeMutation = () => {
+  return React.useCallback(
+    (newRow, oldRow) =>
+      new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (newRow.name?.trim() === "") {
+            reject(new Error("Error while saving user: name can't be empty."));
+          } else {
+            resolve({ ...newRow, name: newRow.name?.toUpperCase() });
+          }
+        }, 200);
+      }),
+    []
   );
-}
-
-EditToolbar.propTypes = {
-  cellMode: PropTypes.oneOf(['edit', 'view']).isRequired,
-  cellModesModel: PropTypes.object.isRequired,
-  selectedCellParams: PropTypes.shape({
-    field: PropTypes.string.isRequired,
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-  }),
-  setCellModesModel: PropTypes.func.isRequired,
 };
 
-export default function StartEditButtonGrid() {
-  const [selectedCellParams, setSelectedCellParams] = React.useState(null);
-  const [cellModesModel, setCellModesModel] = React.useState({});
+export default function ServerPaginationGrid(props) {
+  const { addRowHandle } = props;
+  const [paginationModel, setPaginationModel] = React.useState({
+    page: 1,
+    pageSize: 25,
+  });
+  const { isLoading, rows, pageInfo } = useQuery(paginationModel);
+  const [rowCountState, setRowCountState] = React.useState(pageInfo?.totalRowCount || 0);
+  React.useEffect(() => {
+    setRowCountState((prevRowCountState) =>
+      pageInfo?.totalRowCount !== undefined ? pageInfo?.totalRowCount : prevRowCountState
+    );
+  }, [pageInfo?.totalRowCount, setRowCountState]);
 
-  const handleCellFocus = React.useCallback((event) => {
-    const row = event.currentTarget.parentElement;
-    const id = row.dataset.id;
-    const field = event.currentTarget.dataset.field;
-    debugger;
-    setSelectedCellParams({ id, field });
-  }, []);
+  const [rowsData, setRowsData] = React.useState([]);
+  const mutateRow = useFakeMutation();
 
-  const cellMode = React.useMemo(() => {
-    debugger;
-    if (!selectedCellParams) {
-      return 'view';
-    }
-    const { id, field } = selectedCellParams;
-    return cellModesModel[id]?.[field]?.mode || 'view';
-  }, [cellModesModel, selectedCellParams]);
+  const [snackbar, setSnackbar] = React.useState(null);
 
-  const handleCellKeyDown = React.useCallback(
-    (params, event) => {
+  const handleCloseSnackbar = () => setSnackbar(null);
+
+  const processRowUpdate = React.useCallback(
+    async (newRow, oldRow, abc, def) => {
       debugger;
-      if (cellMode === 'edit') {
-        // Prevents calling event.preventDefault() if Tab is pressed on a cell in edit mode
-        event.defaultMuiPrevented = true;
-      }
+      // Make the HTTP request to save in the backend
+      const response = await mutateRow(newRow, oldRow);
+      setSnackbar({ children: "User successfully saved", severity: "success" });
+      return response;
     },
-    [cellMode],
+    [mutateRow]
   );
 
+  const handleProcessRowUpdateError = React.useCallback((error) => {
+    setSnackbar({ children: error.message, severity: "error" });
+  }, []);
+
+  useEffect(() => {
+    // mock 数据
+    const rows = Mock.mock({
+      "list|20000-100000": [
+        {
+          "id|+1": 1,
+          "aliId|+1": Random.integer(1000),
+          "aliuserName|1": [
+            Random.cname(),
+            Random.cname(),
+            Random.cname(),
+            Random.cname(),
+            Random.cname(),
+            Random.cname(),
+            Random.cname(),
+          ],
+          "platform|+1": 2000001,
+          "wechatAccount|+1": 32233,
+          "trackingNumber|+1": 22312,
+          promotedProducts: "洗手液",
+          recoveryState: true,
+          refundState: false,
+          "promoter|1": [
+            Random.cname(),
+            Random.cname(),
+            Random.cname(),
+            Random.cname(),
+            Random.cname(),
+            Random.cname(),
+            Random.cname(),
+          ],
+          "createTime|+3000": 1723242342,
+        },
+      ],
+    });
+    setRowsData(rows.list);
+  }, []);
+
   return (
-    <div style={{ height: 600, width: '100%' }}>
+    <div style={{ height: 550, width: "100%" }}>
       <DataGrid
-        rows={rows}
+        localeText={zhCN.components.MuiDataGrid.defaultProps.localeText}
+        checkboxSelection
+        rows={rowsData}
         columns={columns}
-        onCellKeyDown={handleCellKeyDown}
-        cellModesModel={cellModesModel}
-        onCellModesModelChange={(model) => setCellModesModel(model)}
-        slots={{
-          toolbar: EditToolbar,
-        }}
-        slotProps={{
-          toolbar: {
-            cellMode,
-            selectedCellParams,
-            setSelectedCellParams,
-            cellModesModel,
-            setCellModesModel,
-          },
-          cell: {
-            onFocus: handleCellFocus,
+        // rowCount={rowCountState}
+        loading={isLoading}
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 25,
+            },
           },
         }}
+        pageSizeOptions={[25, 50, 100]}
+        // paginationModel={paginationModel}
+        // paginationMode="server"
+        onPaginationModelChange={setPaginationModel}
+        processRowUpdate={processRowUpdate}
+        onProcessRowUpdateError={handleProcessRowUpdateError}
       />
+      {!!snackbar && (
+        <Snackbar
+          open
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          onClose={handleCloseSnackbar}
+          autoHideDuration={6000}
+        >
+          <Alert {...snackbar} onClose={handleCloseSnackbar} />
+        </Snackbar>
+      )}
     </div>
   );
 }
-
-const columns = [
-  { field: 'name', headerName: 'Name', width: 180, editable: true },
-  { field: 'age', headerName: 'Age', type: 'number', editable: true },
-  {
-    field: 'dateCreated',
-    headerName: 'Date Created',
-    type: 'date',
-    width: 180,
-    editable: true,
-  },
-  {
-    field: 'lastLogin',
-    headerName: 'Last Login',
-    type: 'dateTime',
-    width: 220,
-    editable: true,
-  },
-];
-
-const rows = [
-  {
-    id: 1,
-    name: randomTraderName(),
-    age: 25,
-    dateCreated: randomCreatedDate(),
-    lastLogin: randomUpdatedDate(),
-  },
-  {
-    id: 2,
-    name: randomTraderName(),
-    age: 36,
-    dateCreated: randomCreatedDate(),
-    lastLogin: randomUpdatedDate(),
-  },
-  {
-    id: 3,
-    name: randomTraderName(),
-    age: 19,
-    dateCreated: randomCreatedDate(),
-    lastLogin: randomUpdatedDate(),
-  },
-  {
-    id: 4,
-    name: randomTraderName(),
-    age: 28,
-    dateCreated: randomCreatedDate(),
-    lastLogin: randomUpdatedDate(),
-  },
-  {
-    id: 5,
-    name: randomTraderName(),
-    age: 23,
-    dateCreated: randomCreatedDate(),
-    lastLogin: randomUpdatedDate(),
-  },
-];

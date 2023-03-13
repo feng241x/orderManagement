@@ -25,18 +25,18 @@ const Page = () => {
   const [method, setMethod] = useState("login");
   const formik = useFormik({
     initialValues: {
-      email: "demo@devias.io",
-      password: "Password123!",
+      username: "admin",
+      password: "123456",
       submit: null,
     },
     validationSchema: Yup.object({
-      email: Yup.string().email("Must be a valid email").max(255).required("Email is required"),
-      password: Yup.string().max(255).required("Password is required"),
+      username: Yup.string().max(255).required("请输入账号信息"),
+      password: Yup.string().max(255).required("请输入密码"),
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signIn(values.email, values.password);
-        router.push("/");
+        await auth.signIn(values.username, values.password);
+        router.push("/orderManagement");
       } catch (err) {
         helpers.setStatus({ success: false });
         helpers.setErrors({ submit: err.message });
@@ -88,15 +88,15 @@ const Page = () => {
               <form noValidate onSubmit={formik.handleSubmit}>
                 <Stack spacing={3}>
                   <TextField
-                    error={!!(formik.touched.email && formik.errors.email)}
+                    error={!!(formik.touched.username && formik.errors.username)}
                     fullWidth
-                    helperText={formik.touched.email && formik.errors.email}
+                    helperText={formik.touched.username && formik.errors.username}
                     label="账号"
-                    name="email"
+                    name="username"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="email"
-                    value={formik.values.email}
+                    type="input"
+                    value={formik.values.username}
                   />
                   <TextField
                     error={!!(formik.touched.password && formik.errors.password)}

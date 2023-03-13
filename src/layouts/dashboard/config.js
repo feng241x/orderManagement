@@ -9,15 +9,15 @@ import XCircleIcon from "@heroicons/react/24/solid/XCircleIcon";
 import { SvgIcon } from "@mui/material";
 
 export const items = [
-  {
-    title: "工作台",
-    path: "/",
-    icon: (
-      <SvgIcon fontSize="small">
-        <ChartBarIcon />
-      </SvgIcon>
-    ),
-  },
+  // {
+  //   title: "工作台",
+  //   path: "/",
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //       <ChartBarIcon />
+  //     </SvgIcon>
+  //   ),
+  // },
 
   {
     title: "订单管理",
@@ -35,15 +35,6 @@ export const items = [
     icon: (
       <SvgIcon fontSize="small">
         <CogIcon />
-      </SvgIcon>
-    ),
-  },
-  {
-    title: "个人资料",
-    path: "/account",
-    icon: (
-      <SvgIcon fontSize="small">
-        <UserIcon />
       </SvgIcon>
     ),
   },
