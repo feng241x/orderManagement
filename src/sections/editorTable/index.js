@@ -239,11 +239,29 @@ export default function ServerPaginationGrid() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogTitle>新建订单</DialogTitle>
           <DialogContent>
-            <TextField label="平台单号" type="text" {...register("username", { required: true })} />
             <TextField
-              label="Password"
-              type="password"
-              {...register("password", { required: true })}
+              label="平台单号"
+              type="text"
+              fullWidth
+              {...register("username", { required: true })}
+            />
+            <TextField
+              label="支付宝账号"
+              type="text"
+              fullWidth
+              {...register("aliId", { required: true })}
+            />
+            <TextField
+              label="支付宝名称"
+              fullWidth
+              type="text"
+              {...register("aliuserName", { required: true })}
+            />
+            <TextField
+              label="平台账号"
+              fullWidth
+              type="text"
+              {...register("platform", { required: true })}
             />
           </DialogContent>
           <DialogActions>
