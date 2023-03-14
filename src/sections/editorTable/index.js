@@ -4,6 +4,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Mock from "mockjs";
 import Button from "@mui/material/Button";
+import { useForm } from "react-hook-form";
 import {
   zhCN,
   DataGrid,
@@ -103,6 +104,8 @@ export default function ServerPaginationGrid() {
   // 新增订单弹窗状态管理
   const [openDialog, setOpenDialog] = React.useState(false);
   const [rowsData, setRowsData] = React.useState([]);
+  const [value, setValue] = React.useState(null);
+  const { register, handleSubmit, formState } = useForm();
   const mutateRow = useFakeMutation();
 
   const [snackbar, setSnackbar] = React.useState(null);
@@ -198,6 +201,11 @@ export default function ServerPaginationGrid() {
     setOpenDialog(false);
   };
 
+  // 提交新建表单
+  const onSubmit = (data) => {
+    console.log(data);
+  };
+
   return (
     <div style={{ height: 550, width: "100%" }}>
       <DataGrid
@@ -228,59 +236,23 @@ export default function ServerPaginationGrid() {
         slots={{ toolbar: CustomToolbar }}
       />
       <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>新建订单</DialogTitle>
-        <DialogContent>
-          <DialogContentText>请输入订单详细信息.</DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="订单编号"
-            type="email"
-            fullWidth
-            variant="standard"
-          />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="订单编号"
-            type="email"
-            fullWidth
-            variant="standard"
-          />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="订单编号"
-            type="email"
-            fullWidth
-            variant="standard"
-          />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="订单编号"
-            type="email"
-            fullWidth
-            variant="standard"
-          />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="订单编号"
-            type="email"
-            fullWidth
-            variant="standard"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>取消</Button>
-          <Button onClick={handleCloseDialog}>提交</Button>
-        </DialogActions>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DialogTitle>新建订单</DialogTitle>
+          <DialogContent>
+            <TextField label="平台单号" type="text" {...register("username", { required: true })} />
+            <TextField
+              label="Password"
+              type="password"
+              {...register("password", { required: true })}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>取消</Button>
+            <Button type="submit" disabled={formState.isSubmitting}>
+              提交
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
       {!!snackbar && (
         <Snackbar
