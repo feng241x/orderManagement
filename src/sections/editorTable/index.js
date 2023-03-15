@@ -3,7 +3,9 @@ import { useEffect } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Mock from "mockjs";
-import Button from "@mui/material/Button";
+import { Button, SvgIcon } from "@mui/material";
+import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import { useForm } from "react-hook-form";
 import {
   zhCN,
@@ -176,12 +178,31 @@ export default function ServerPaginationGrid() {
   const CustomToolbar = () => {
     return (
       <GridToolbarContainer>
-        <Button size="small" onClick={handleAddRow}>
+        <Button
+          size="small"
+          startIcon={
+            <SvgIcon fontSize="small">
+              <AddBoxOutlinedIcon />
+            </SvgIcon>
+          }
+          onClick={handleAddRow}
+        >
           新增订单
         </Button>
         <GridToolbarColumnsButton />
         <GridToolbarFilterButton />
         <GridToolbarDensitySelector />
+
+        <Button
+          size="small"
+          startIcon={
+            <SvgIcon fontSize="small">
+              <FileUploadOutlinedIcon />
+            </SvgIcon>
+          }
+        >
+          导入
+        </Button>
         <GridToolbarExport
           printOptions={{
             disableToolbarButton: true,
@@ -207,8 +228,9 @@ export default function ServerPaginationGrid() {
   };
 
   return (
-    <div style={{ height: 550, width: "100%" }}>
+    <div style={{ height: 650, width: "100%" }}>
       <DataGrid
+        height="auto"
         dataSet="Commodity"
         sx={{
           boxShadow: 2,
@@ -243,23 +265,27 @@ export default function ServerPaginationGrid() {
               label="平台单号"
               type="text"
               fullWidth
+              margin="dense"
               {...register("username", { required: true })}
             />
             <TextField
               label="支付宝账号"
               type="text"
               fullWidth
+              margin="dense"
               {...register("aliId", { required: true })}
             />
             <TextField
               label="支付宝名称"
               fullWidth
+              margin="dense"
               type="text"
               {...register("aliuserName", { required: true })}
             />
             <TextField
               label="平台账号"
               fullWidth
+              margin="dense"
               type="text"
               {...register("platform", { required: true })}
             />
