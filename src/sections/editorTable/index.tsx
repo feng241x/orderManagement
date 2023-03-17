@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Mock from "mockjs";
@@ -24,64 +24,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 
 const Random = Mock.Random;
-const columnsFields = [
-  {
-    field: "id",
-    title: "平台单号",
-    minWidth: 100,
-  },
-  {
-    field: "aliId",
-    title: "支付宝账号",
-  },
-  {
-    field: "aliuserName",
-    title: "支付宝户主",
-  },
-  {
-    field: "platform",
-    title: "平台账号",
-  },
-  {
-    field: "'wechatAccount'",
-    title: "微信号",
-  },
-  {
-    field: "trackingNumber",
-    title: "物流单号",
-  },
-  {
-    field: "promotedProducts",
-    title: "推广产品",
-    editable: true,
-  },
-  {
-    field: "recoveryState",
-    title: "回收状态",
-    editable: true,
-  },
-  {
-    field: "refundState",
-    title: "返款状态",
-    editable: true,
-  },
-  {
-    field: "promoter",
-    title: "推广人",
-  },
-  {
-    field: "createTime",
-    title: "创建时间",
-  },
-];
-
-const columns = columnsFields.map((item) => ({
-  field: item.field,
-  headerName: item.title,
-  minWidth: item.minWidth || 150,
-  type: item.type,
-  editable: item.editable || false,
-}));
 
 const useFakeMutation = () => {
   return React.useCallback(
@@ -99,11 +41,16 @@ const useFakeMutation = () => {
   );
 };
 
-export default function ServerPaginationGrid() {
+interface EditDataGridProp {
+  columnsFields: any[];
+}
+
+export default function EditDataGrid(opts: EditDataGridProp) {
+  const [columns, setColumns] = useState([]);
+  const { columnsFields } = opts;
   // 新增订单弹窗状态管理
   const [openDialog, setOpenDialog] = React.useState(false);
   const [rowsData, setRowsData] = React.useState([]);
-  const [value, setValue] = React.useState(null);
   const { register, handleSubmit, formState } = useForm();
   const mutateRow = useFakeMutation();
 
@@ -127,6 +74,15 @@ export default function ServerPaginationGrid() {
   }, []);
 
   useEffect(() => {
+    // 设置列表列头
+    const columns = columnsFields.map((item: any) => ({
+      field: item.field,
+      headerName: item.title,
+      minWidth: item.minWidth || 150,
+      type: item.type,
+      editable: item.editable || false,
+    }));
+    setColumns(columns);
     // mock 数据
     const rows = Mock.mock({
       "list|200-1000": [
@@ -164,14 +120,6 @@ export default function ServerPaginationGrid() {
     setRowsData(rows.list);
   }, []);
 
-  const createRandomRow = () => {
-    let newData = {};
-    columnsFields.forEach((item, index) => {
-      newData[item["field"]] = item["field"] === "id" ? "-1" : "";
-    });
-    return newData;
-  };
-
   const CustomToolbar = () => {
     return (
       <GridToolbarContainer>
@@ -184,7 +132,7 @@ export default function ServerPaginationGrid() {
           }
           onClick={handleAddRow}
         >
-          新增订单
+          新增
         </Button>
         <Button
           size="small"
@@ -194,7 +142,7 @@ export default function ServerPaginationGrid() {
             </SvgIcon>
           }
         >
-          删除订单
+          删除
         </Button>
         <GridToolbarColumnsButton />
         <GridToolbarFilterButton />

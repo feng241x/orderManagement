@@ -22,62 +22,21 @@ const start = now.subtract(3, "day");
 // 定义列属性
 const columnsFields = [
   {
-    field: "id",
-    title: "平台单号",
-    minWidth: 100,
-    editable: true,
-  },
-  {
-    field: "aliId",
-    title: "支付宝账号",
-    editable: true,
-  },
-  {
-    field: "aliuserName",
-    title: "支付宝户主",
-    editable: true,
-  },
-  {
-    field: "platform",
-    title: "平台账号",
-    editable: true,
-  },
-  {
-    field: "'wechatAccount'",
-    title: "微信号",
-    editable: true,
-  },
-  {
     field: "trackingNumber",
     title: "物流单号",
     editable: true,
   },
   {
-    field: "promotedProducts",
-    title: "推广产品",
-    editable: true,
+    field: "promoter",
+    title: "录入人",
+  },
+  {
+    field: "createTime",
+    title: "录入时间",
   },
   {
     field: "recoveryState",
     title: "回收状态",
-    editable: true,
-  },
-  {
-    field: "refundState",
-    title: "返款状态",
-    editable: true,
-  },
-  {
-    field: "promoter",
-    title: "推广人",
-  },
-  {
-    field: "createTime",
-    title: "创建时间",
-  },
-  {
-    field: "money",
-    title: "金额",
     editable: true,
   },
 ];
@@ -111,7 +70,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>订单管理 | 订单管理系统</title>
+        <title>物流订单 | 订单管理系统</title>
       </Head>
       <Box
         component="main"
@@ -124,7 +83,7 @@ const Page = () => {
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={3}>
-                <Typography variant="h4">订单管理</Typography>
+                <Typography variant="h4">物流订单</Typography>
                 <Stack alignItems="center" direction="row" spacing={3}>
                   <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"zh-cn"}>
                     <DatePicker

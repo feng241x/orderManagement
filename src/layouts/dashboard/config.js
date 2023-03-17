@@ -31,7 +31,7 @@ export const items = [
 
   {
     title: "物流单号",
-    path: "/settings",
+    path: "/trackingNumber",
     icon: (
       <SvgIcon fontSize="small">
         <CogIcon />
