@@ -5,6 +5,7 @@ import Alert from "@mui/material/Alert";
 import Mock from "mockjs";
 import { Button, SvgIcon } from "@mui/material";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import DeleteIcon from "@mui/icons-material/Delete";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import { useForm } from "react-hook-form";
 import {
@@ -184,6 +185,16 @@ export default function ServerPaginationGrid() {
           onClick={handleAddRow}
         >
           新增订单
+        </Button>
+        <Button
+          size="small"
+          startIcon={
+            <SvgIcon fontSize="small">
+              <DeleteIcon />
+            </SvgIcon>
+          }
+        >
+          删除订单
         </Button>
         <GridToolbarColumnsButton />
         <GridToolbarFilterButton />

@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, { forwardRef, useState } from "react";
 import Head from "next/head";
 import TextField from "@mui/material/TextField";
-import { Box, Container, Stack, Typography } from "@mui/material";
+import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import ServerPaginationGrid from "../sections/editorTable/index.js";
+import SendIcon from "@mui/icons-material/Send";
+import ServerPaginationGrid from "../sections/editorTable/index";
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 
-const Alert = React.forwardRef(function Alert(props, ref) {
+const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={3} ref={ref} variant="filled" {...props} />;
 });
 
@@ -31,6 +32,15 @@ const Page = () => {
     horizontal: "center",
     message: "请输入正确时间",
   });
+  // 重新查询数据
+  const searchDataHandle = () => {
+    // 获取开始 结束时间
+    const queryParams = {
+      startDate,
+      endDate,
+    };
+    console.log(JSON.stringify(queryParams));
+  };
   const handleClose = () => {
     setAlertState({ ...alertState, open: false });
   };
@@ -53,7 +63,7 @@ const Page = () => {
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={3}>
                 <Typography variant="h4">订单管理</Typography>
-                <Stack alignItems="center" direction="row" spacing={1}>
+                <Stack alignItems="center" direction="row" spacing={3}>
                   <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"zh-cn"}>
                     <DatePicker
                       label="开始时间"
@@ -87,6 +97,9 @@ const Page = () => {
                       }}
                       renderInput={(params) => <TextField {...params} />}
                     />
+                    <Button onClick={searchDataHandle} color="primary" variant="contained">
+                      查询
+                    </Button>
                   </LocalizationProvider>
                 </Stack>
               </Stack>
