@@ -50,7 +50,7 @@ const Page = () => (
           </Typography>
           <Button
             component={NextLink}
-            href="/"
+            href="/orderManagement"
             startIcon={
               <SvgIcon fontSize="small">
                 <ArrowLeftIcon />
