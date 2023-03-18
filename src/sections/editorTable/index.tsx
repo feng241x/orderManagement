@@ -27,7 +27,7 @@ const Random = Mock.Random;
 
 const useFakeMutation = () => {
   return React.useCallback(
-    (newRow, oldRow) =>
+    (newRow: any, oldRow: any) =>
       new Promise((resolve, reject) => {
         setTimeout(() => {
           if (newRow.name?.trim() === "") {
@@ -54,28 +54,28 @@ export default function EditDataGrid(opts: EditDataGridProp) {
   const { register, handleSubmit, formState } = useForm();
   const mutateRow = useFakeMutation();
 
-  const [snackbar, setSnackbar] = React.useState(null);
+  const [snackbar, setSnackbar] = React.useState<any>(null);
 
   const handleCloseSnackbar = () => setSnackbar(null);
 
   const processRowUpdate = React.useCallback(
-    async (newRow, oldRow, abc, def) => {
+    async (newRow: any, oldRow: any) => {
       debugger;
       // Make the HTTP request to save in the backend
       const response = await mutateRow(newRow, oldRow);
-      setSnackbar({ children: "User successfully saved", severity: "success" });
+      setSnackbar({ children: "User successfully saved", severity: "success" } as any);
       return response;
     },
     [mutateRow]
   );
 
-  const handleProcessRowUpdateError = React.useCallback((error) => {
-    setSnackbar({ children: error.message, severity: "error" });
+  const handleProcessRowUpdateError = React.useCallback((error: any) => {
+    setSnackbar({ children: error.message, severity: "error" } as any);
   }, []);
 
   useEffect(() => {
     // 设置列表列头
-    const columns = columnsFields.map((item: any) => ({
+    const columns: any = columnsFields.map((item: any) => ({
       field: item.field,
       headerName: item.title,
       minWidth: item.minWidth || 150,
@@ -118,7 +118,7 @@ export default function EditDataGrid(opts: EditDataGridProp) {
       ],
     });
     setRowsData(rows.list);
-  }, []);
+  }, [columnsFields]);
 
   const CustomToolbar = () => {
     return (
@@ -178,15 +178,13 @@ export default function EditDataGrid(opts: EditDataGridProp) {
   };
 
   // 提交新建表单
-  const onSubmit = (data) => {
+  const onSubmit = (data: any) => {
     console.log(data);
   };
 
   return (
     <div style={{ height: 650, width: "100%" }}>
       <DataGrid
-        height="auto"
-        dataSet="Commodity"
         sx={{
           boxShadow: 2,
           border: 2,
@@ -199,7 +197,6 @@ export default function EditDataGrid(opts: EditDataGridProp) {
         checkboxSelection
         rows={rowsData}
         columns={columns}
-        // rowCount={rowCountState}
         initialState={{
           pagination: {
             paginationModel: {

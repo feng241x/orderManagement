@@ -2,7 +2,7 @@ import React, { forwardRef, useState } from "react";
 import Head from "next/head";
 import TextField from "@mui/material/TextField";
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
-import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
+import { Layout as DashboardLayout } from "../layouts/dashboard/layout";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -12,7 +12,7 @@ import EditDataGrid from "../sections/editorTable/";
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 
-const Alert = forwardRef(function Alert(props, ref) {
+const Alert = forwardRef(function Alert(props: any, ref: any) {
   return <MuiAlert elevation={3} ref={ref} variant="filled" {...props} />;
 });
 
@@ -106,7 +106,7 @@ const Page = () => {
   const handleClose = () => {
     setAlertState({ ...alertState, open: false });
   };
-  const { vertical, horizontal, open, message } = alertState;
+  const { vertical, horizontal, open, message }: any = alertState;
 
   return (
     <>
@@ -130,7 +130,7 @@ const Page = () => {
                     <DatePicker
                       label="开始时间"
                       value={startDate}
-                      onChange={(newValue) => {
+                      onChange={(newValue: any) => {
                         if (dayjs(newValue).diff(endDate) > 0) {
                           setAlertState({
                             ...alertState,
@@ -146,7 +146,7 @@ const Page = () => {
                     <DatePicker
                       label="结束时间"
                       value={endDate}
-                      onChange={(newValue) => {
+                      onChange={(newValue: any) => {
                         if (dayjs(newValue).diff(startDate) < 0) {
                           setAlertState({
                             ...alertState,
@@ -184,6 +184,6 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
+Page.getLayout = (page: any) => <DashboardLayout>{page}</DashboardLayout>;
 
 export default Page;

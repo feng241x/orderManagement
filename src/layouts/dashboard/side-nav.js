@@ -1,15 +1,10 @@
-import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import PropTypes from "prop-types";
-import ArrowTopRightOnSquareIcon from "@heroicons/react/24/solid/ArrowTopRightOnSquareIcon";
-import ChevronUpDownIcon from "@heroicons/react/24/solid/ChevronUpDownIcon";
 import {
   Box,
-  Button,
   Divider,
   Drawer,
   Stack,
-  SvgIcon,
   Typography,
   useMediaQuery,
 } from "@mui/material";
@@ -97,19 +92,6 @@ export const SideNav = (props) => {
           </Stack>
         </Box>
         <Divider sx={{ borderColor: "neutral.700" }} />
-        {/* <Box
-          sx={{
-            px: 2,
-            py: 3,
-          }}
-        >
-          <Typography color="neutral.100" variant="subtitle2">
-            ishangsf.com
-          </Typography>
-          <Typography color="neutral.500" variant="body2">
-            Made with ❤ by
-          </Typography>
-        </Box> */}
       </Box>
     </Scrollbar>
   );
