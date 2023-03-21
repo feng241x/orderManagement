@@ -1,5 +1,5 @@
 {
-  "name": "ordermanagement",
+  "name": "ordermanagementapp",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -9,6 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/node": "18.15.5",
+    "@types/react": "18.0.28",
+    "@types/react-dom": "18.0.11",
+    "eslint": "8.36.0",
+    "eslint-config-next": "13.2.4",
+    "typescript": "5.0.2",
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.6",
     "@emotion/server": "11.10.0",
@@ -19,17 +25,12 @@
     "@mui/system": "5.11.9",
     "@mui/x-data-grid": "^6.0.1",
     "@mui/x-date-pickers": "5.0.19",
-    "@types/node": "18.15.3",
-    "@types/react": "18.0.28",
-    "@types/react-dom": "18.0.11",
     "apexcharts": "3.37.0",
     "axios": "^1.3.4",
     "date-fns": "2.29.3",
     "dayjs": "^1.11.7",
-    "eslint": "8.36.0",
-    "eslint-config-next": "13.2.4",
     "formik": "2.2.9",
-    "next": "13.2.4",
+    "next": "13.1.6",
     "nprogress": "0.2.0",
     "prop-types": "15.8.1",
     "react": "18.2.0",
@@ -37,12 +38,10 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.5",
     "simplebar-react": "^3.2.1",
-    "typescript": "5.0.2",
     "yup": "1.0.0"
   },
   "devDependencies": {
     "@mui/x-data-grid-generator": "^6.0.1",
-    "@types/mockjs": "^1.0.7",
     "@types/node": "18.13.0",
     "@types/nprogress": "0.2.0",
     "@types/numeral": "2.0.2",

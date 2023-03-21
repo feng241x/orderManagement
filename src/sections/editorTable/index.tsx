@@ -63,7 +63,10 @@ export default function EditDataGrid(opts: EditDataGridProp) {
       debugger;
       // Make the HTTP request to save in the backend
       const response = await mutateRow(newRow, oldRow);
-      setSnackbar({ children: "User successfully saved", severity: "success" } as any);
+      setSnackbar({
+        children: "User successfully saved",
+        severity: "success",
+      } as any);
       return response;
     },
     [mutateRow]
