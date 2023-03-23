@@ -1,11 +1,12 @@
 import PropTypes from "prop-types";
 import NextLink from "next/link";
+import Image from "next/image";
 import { Box, Typography, Unstable_Grid2 as Grid } from "@mui/material";
-import { Logo } from "src/components/logo";
+import { Logo } from "../../components/logo";
 
 // TODO: Change subtitle text
 
-export const Layout = (props) => {
+export const Layout = (props: any) => {
   const { children } = props;
 
   return (
@@ -81,7 +82,7 @@ export const Layout = (props) => {
                 Order Management System
               </Box>
             </Typography>
-            <img alt="" src="/assets/auth-illustration.svg" />
+            <Image alt="" src="/assets/auth-illustration.svg" />
           </Box>
         </Grid>
       </Grid>
