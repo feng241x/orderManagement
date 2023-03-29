@@ -1,18 +1,6 @@
 import PropTypes from "prop-types";
-import BellIcon from "@heroicons/react/24/solid/BellIcon";
-import UsersIcon from "@heroicons/react/24/solid/UsersIcon";
 import Bars3Icon from "@heroicons/react/24/solid/Bars3Icon";
-import MagnifyingGlassIcon from "@heroicons/react/24/solid/MagnifyingGlassIcon";
-import {
-  Avatar,
-  Badge,
-  Box,
-  IconButton,
-  Stack,
-  SvgIcon,
-  Tooltip,
-  useMediaQuery,
-} from "@mui/material";
+import { Avatar, Box, IconButton, Stack, SvgIcon, useMediaQuery } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { usePopover } from "src/hooks/use-popover";
 import { AccountPopover } from "./account-popover";
@@ -31,8 +19,7 @@ export const TopNav = (props) => {
         component="header"
         sx={{
           backdropFilter: "blur(6px)",
-          backgroundColor: (theme) =>
-            alpha(theme.palette.background.default, 0.8),
+          backgroundColor: (theme) => alpha(theme.palette.background.default, 0.8),
           position: "sticky",
           left: {
             lg: `${SIDE_NAV_WIDTH}px`,

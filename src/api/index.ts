@@ -8,7 +8,16 @@ export const myAxios = axios.create({
   baseURL: "/api",
 });
 
-myAxios.interceptors.request.use(function (request) {
+/** token header */
+export function generateTokenHeader() {
+  const token = localStorage.getItem("token");
+  if (token) {
+    return { Auth_Token: `Bearer ${token}` };
+  }
+  return null;
+}
+
+myAxios.interceptors.request.use(function (request: any) {
   if (request.withCredentials !== false) {
     const tokenHeader = generateTokenHeader();
     if (tokenHeader) {

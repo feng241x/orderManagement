@@ -4,20 +4,11 @@ import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import {
-  Alert,
-  Box,
-  Button,
-  FormHelperText,
-  Link,
-  Stack,
-  Tab,
-  Tabs,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { useAuth } from "src/hooks/use-auth";
-import { Layout as AuthLayout } from "src/layouts/auth/layout";
+import { Box, Button, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { useAuth } from "@/hooks/use-auth";
+import { Layout as AuthLayout } from "@/layouts/auth/layout";
+import { myAxios } from "@/api";
+import { setToken } from "@/utils";
 
 const Page = () => {
   const router = useRouter();
@@ -25,8 +16,8 @@ const Page = () => {
   const [method, setMethod] = useState("login");
   const formik = useFormik({
     initialValues: {
-      username: "admin",
-      password: "123456",
+      username: "",
+      password: "",
       submit: null,
     },
     validationSchema: Yup.object({
@@ -35,9 +26,10 @@ const Page = () => {
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signIn(values.username, values.password);
-        router.push("/orderManagement");
-      } catch (err) {
+        auth.signIn(values.username, values.password).finally((result: boolean) => {
+          if (result) router.push("/orderManagement");
+        });
+      } catch (err: any) {
         helpers.setStatus({ success: false });
         helpers.setErrors({ submit: err.message });
         helpers.setSubmitting(false);
@@ -45,14 +37,9 @@ const Page = () => {
     },
   });
 
-  const handleMethodChange = useCallback((event, value) => {
+  const handleMethodChange = useCallback((event: any, value: any) => {
     setMethod(value);
   }, []);
-
-  const handleSkip = useCallback(() => {
-    auth.skip();
-    router.push("/");
-  }, [auth, router]);
 
   return (
     <>
@@ -133,6 +120,6 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => <AuthLayout>{page}</AuthLayout>;
+Page.getLayout = (page: any) => <AuthLayout>{page}</AuthLayout>;
 
 export default Page;

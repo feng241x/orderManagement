@@ -1,5 +1,8 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from "react";
 import PropTypes from "prop-types";
+import { myAxios } from "@/api";
+import { setToken } from "@/utils";
+import router from "next/router";
 
 const HANDLERS = {
   INITIALIZE: "INITIALIZE",
@@ -49,14 +52,15 @@ const handlers = {
   },
 };
 
-const reducer = (state, action) =>
+const reducer = (state: string, action: any) =>
   handlers[action.type] ? handlers[action.type](state, action) : state;
 
 // The role of this context is to propagate authentication state through the App tree.
 
 export const AuthContext = createContext({ undefined });
 
-export const AuthProvider = (props) => {
+export const AuthProvider = (props: any) => {
+  debugger;
   const { children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
   const initialized = useRef(false);
@@ -124,30 +128,32 @@ export const AuthProvider = (props) => {
     });
   };
 
-  const signIn = async (username, password) => {
+  const signIn = async (username: string, password: string) => {
     debugger;
     // 登录接口逻辑
-    if (username !== "admin" || password !== "123456") {
-      throw new Error("请输入正确的账号/密码信息");
-    }
-
-    try {
-      window.sessionStorage.setItem("authenticated", "true");
-    } catch (err) {
-      console.error(err);
-    }
-
-    const user = {
-      id: "5e86809283e28b96d2d38537",
-      avatar: "/assets/avatars/avatar-anika-visser.png",
-      name: "Anika Visser",
-      email: "anika.visser@devias.io",
-    };
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user,
-    });
+    return myAxios
+      .post("http://fhhviv.natappfree.cc/login", {
+        username,
+        password,
+      })
+      .then((token: any) => {
+        setToken(token);
+        const user = {
+          id: "5e86809283e28b96d2d38537",
+          avatar: "/assets/avatars/avatar-anika-visser.png",
+          name: "Anika Visser",
+          email: "anika.visser@devias.io",
+        };
+        dispatch({
+          type: HANDLERS.SIGN_IN,
+          payload: user,
+        });
+        router.push("/orderManagement");
+        return true;
+      })
+      .catch((error) => {
+        return false;
+      });
   };
 
   const signUp = async (email, name, password) => {
