@@ -81,6 +81,14 @@ export default function EditDataGrid(opts: EditDataGridProp) {
     onAddRowData,
     onDelHandle,
   } = opts;
+  const [inputValues, setInputValues] = useState({
+    inputValue1: "",
+    inputValue2: "",
+  });
+  const [errors, setErrors] = useState({
+    errorText1: "",
+    errorText2: "",
+  });
   // 新增订单弹窗状态管理
   const [openDialog, setOpenDialog] = useState(false);
   // 删除数据警告弹窗
@@ -286,7 +294,9 @@ export default function EditDataGrid(opts: EditDataGridProp) {
                       select={column.hasOwnProperty("valueOptions")}
                       fullWidth
                       margin="dense"
-                      {...register(column["field"], { required: column["required"] })}
+                      {...register(column["field"], {
+                        required: column["required"],
+                      })}
                     >
                       {column.hasOwnProperty("valueOptions") &&
                         column?.valueOptions.map((option: any) => (

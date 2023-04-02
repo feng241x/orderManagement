@@ -17,7 +17,7 @@ export function userList(params: { createTimeFrom: Dayjs; createTimeTo: Dayjs })
 }
 
 /**
- * 新增订单数据
+ * 新增用户数据
  * @param params
  * @returns
  */
@@ -26,16 +26,18 @@ export function addUser(params: any) {
 }
 
 /**
- * 删除订单数据
+ * 删除用户数据
  * @param params
  * @returns
  */
-export function batchDelUser(idList: string) {
-  return myAxios.get(generateRequestUrl(`delete/${idList}`));
+export function batchDelUser(userId: string) {
+  return myAxios.post(generateRequestUrl("delete"), {
+    userId,
+  });
 }
 
 /**
- * 更新订单数据
+ * 更新用户数据
  * @param params
  * @returns
  */

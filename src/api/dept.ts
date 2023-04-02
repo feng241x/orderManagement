@@ -10,7 +10,7 @@ function generateRequestUrl(action: string) {
  * @param params
  * @returns
  */
-export function deptList(params: { createTimeFrom: Dayjs; createTimeTo: Dayjs }) {
+export function deptList(params?: any) {
   return myAxios.get(generateRequestUrl("list"), {
     params,
   });
@@ -30,8 +30,10 @@ export function addDept(params: any) {
  * @param params
  * @returns
  */
-export function batchDelDept(idList: string) {
-  return myAxios.get(generateRequestUrl(`delete/${idList}`));
+export function batchDelDept(deptId: string) {
+  return myAxios.post(generateRequestUrl("delete"), {
+    deptId,
+  });
 }
 
 /**

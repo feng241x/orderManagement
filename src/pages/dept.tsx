@@ -112,18 +112,27 @@ const Page = () => {
   };
   // 删除订单
   const onDelHandle = (ids: number[]) => {
-    return batchDelDept(ids.join(",")).then((result) => {
-      if (result) {
+    return batchDelDept(ids.join(","))
+      .then((result) => {
+        if (result) {
+          setAlertState({
+            ...alertState,
+            open: true,
+            severity: "success",
+            message: "删除数据成功",
+          });
+        }
+        setDatagridData(datagridData.filter((item) => !ids.includes(item["deptId"])));
+        return true;
+      })
+      .catch((error) => {
         setAlertState({
           ...alertState,
           open: true,
-          severity: "success",
-          message: "删除数据成功",
+          severity: "error",
+          message: error.message,
         });
-      }
-      setDatagridData(datagridData.filter((item) => !ids.includes(item["id"])));
-      return true;
-    });
+      });
   };
   const handleClose = () => {
     setAlertState({ ...alertState, open: false });
