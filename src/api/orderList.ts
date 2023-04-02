@@ -53,3 +53,15 @@ export function importExcel(file: any) {
   formData.append("file", file);
   return myAxios.post(generateRequestUrl("importExcel"), formData);
 }
+
+/**
+ * 下载订单导入模板
+ * @param params
+ * @returns
+ */
+export function exportExcelTemplate() {
+  return myAxios.get(generateRequestUrl("exportExcelTemplate"), {
+    params: {},
+    responseType: "blob",
+  });
+}

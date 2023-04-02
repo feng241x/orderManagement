@@ -17,7 +17,7 @@ const initialState = {
 };
 
 const handlers = {
-  [HANDLERS.INITIALIZE]: (state, action) => {
+  [HANDLERS.INITIALIZE]: (state: any, action: any) => {
     const user = action.payload;
 
     return {
@@ -34,7 +34,7 @@ const handlers = {
           }),
     };
   },
-  [HANDLERS.SIGN_IN]: (state, action) => {
+  [HANDLERS.SIGN_IN]: (state: any, action: any) => {
     const user = action.payload;
 
     return {
@@ -43,7 +43,7 @@ const handlers = {
       user,
     };
   },
-  [HANDLERS.SIGN_OUT]: (state) => {
+  [HANDLERS.SIGN_OUT]: (state: any) => {
     return {
       ...state,
       isAuthenticated: false,
@@ -83,8 +83,9 @@ export const AuthProvider = (props: any) => {
     if (token) {
       // 获取当前用户信息
       const userData: any = await getInfo();
-      const userInfo = userData?.userInfo;
-      if (userInfo) {
+      debugger;
+      if (userData) {
+        const userInfo = userData?.userInfo;
         dispatch({
           type: HANDLERS.INITIALIZE,
           payload: userInfo,
@@ -118,7 +119,7 @@ export const AuthProvider = (props: any) => {
         if (!token) return;
         setToken(token);
         // 获取当前用户信息
-        const userData = await getInfo();
+        const userData: any = await getInfo();
         const user = userData["userInfo"];
         dispatch({
           type: HANDLERS.SIGN_IN,

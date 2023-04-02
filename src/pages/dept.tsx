@@ -51,53 +51,46 @@ const Page = () => {
   }, [startDate, endDate]);
   // 获取枚举
   useEffect(() => {
-    queryRoleScopeEnum().then((result) => {
-      // 定义列属性
-      const defaultColumnsFields = [
-        {
-          field: "deptName",
-          headerName: "部门名称",
-          minWidth: 200,
-          editable: true,
-        },
-        {
-          field: "status",
-          headerName: "状态",
-          minWidth: 120,
-          editable: true,
-          type: "singleSelect",
-          valueOptions: [
-            { label: "禁用", value: 0 },
-            { label: "启用", value: 1 },
-          ],
-          renderCell: ({ value }: any) => (
-            <Chip
-              label={value ? "启用" : "禁用"}
-              color={value ? "success" : "default"}
-              icon={value ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
-            />
-          ),
-        },
-        {
-          field: "createTime",
-          headerName: "创建时间",
-          minWidth: 150,
-          type: "dateTime",
-          valueFormatter: ({ value }: any) => value && dayjs(value).format("YYYY/MM/DD HH:mm"),
-        },
-      ];
-      setColumnsFields(defaultColumnsFields);
-    });
+    setTimeout(() => {
+      queryRoleScopeEnum().then((result) => {
+        // 定义列属性
+        const defaultColumnsFields = [
+          {
+            field: "deptName",
+            headerName: "部门名称",
+            minWidth: 200,
+            editable: true,
+          },
+          {
+            field: "status",
+            headerName: "状态",
+            minWidth: 120,
+            editable: true,
+            type: "singleSelect",
+            valueOptions: [
+              { label: "禁用", value: 0 },
+              { label: "启用", value: 1 },
+            ],
+            renderCell: ({ value }: any) => (
+              <Chip
+                label={value ? "启用" : "禁用"}
+                color={value ? "success" : "default"}
+                icon={value ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
+              />
+            ),
+          },
+          {
+            field: "createTime",
+            headerName: "创建时间",
+            minWidth: 150,
+            type: "dateTime",
+            valueFormatter: ({ value }: any) => value && dayjs(value).format("YYYY/MM/DD HH:mm"),
+          },
+        ];
+        setColumnsFields(defaultColumnsFields);
+      });
+    }, 100);
   }, []);
-  // 重新查询数据
-  const searchDataHandle = () => {
-    // 获取开始 结束时间
-    const queryParams = {
-      startDate,
-      endDate,
-    };
-    console.log(JSON.stringify(queryParams));
-  };
   // 更新编辑行数据
   const onChangeRowData = async (newData: any) => {
     return await editDept(newData);
@@ -105,8 +98,7 @@ const Page = () => {
   // 新增订单
   const onAddRowData = (data: any) => {
     return addDept(data).then((result) => {
-      data["deptId"] = createResourceId();
-      setDatagridData(datagridData.concat([data]));
+      setDatagridData(datagridData.concat([result]));
       return true;
     });
   };
@@ -122,7 +114,7 @@ const Page = () => {
             message: "删除数据成功",
           });
         }
-        setDatagridData(datagridData.filter((item) => !ids.includes(item["deptId"])));
+        setDatagridData(datagridData.filter((item: any) => !ids.includes(item["deptId"])));
         return true;
       })
       .catch((error) => {

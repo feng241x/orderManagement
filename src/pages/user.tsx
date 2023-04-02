@@ -52,21 +52,17 @@ const Page = () => {
   }, [startDate, endDate]);
   // 获取枚举
   useEffect(() => {
-    deptList().then((deptDataList: any[]) => {
-      debugger;
+    deptList().then((deptDataList: any) => {
       // 定义列属性
       const defaultColumnsFields = [
         {
-          field: "userId",
-          headerName: "id",
-          hide: true,
-        },
-        {
           field: "userName",
+          width: 120,
           headerName: "账号",
         },
         {
           field: "nickName",
+          width: 120,
           headerName: "姓名",
           editable: true,
         },
@@ -74,15 +70,13 @@ const Page = () => {
           field: "deptId",
           headerName: "部门名称",
           editable: true,
-        },
-        {
-          field: "deptName",
-          headerName: "部门名称",
-          hide: true,
+          width: 150,
+          type: "singleSelect",
         },
         {
           field: "email",
           headerName: "邮箱",
+          width: 150,
           editable: true,
           preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
             const hasError = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i.test(
@@ -94,6 +88,7 @@ const Page = () => {
         {
           field: "mobile",
           headerName: "手机",
+          minWidth: 120,
           editable: true,
           preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
             const hasError = /^1[3-9]\d{9}$/.test(params.props.value);
@@ -104,6 +99,7 @@ const Page = () => {
           field: "remark",
           headerName: "备注",
           editable: true,
+          minWidth: 200,
         },
         {
           field: "sex",
@@ -148,10 +144,6 @@ const Page = () => {
           value: item["deptId"],
           label: item["deptName"],
         })),
-        // valueParser: (value, params) => {
-        //   const deptData = deptDataList.find((item) => item["deptId"] === value);
-        //   return 333;
-        // },
       });
       setColumnsFields(defaultColumnsFields);
     });
@@ -163,8 +155,7 @@ const Page = () => {
   // 新增订单
   const onAddRowData = (data: any) => {
     return addUser(data).then((result) => {
-      data["userId"] = createResourceId();
-      setDatagridData(datagridData.concat([data]));
+      setDatagridData(datagridData.concat([result]));
       return true;
     });
   };

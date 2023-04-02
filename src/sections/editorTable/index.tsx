@@ -26,6 +26,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { alpha, styled } from "@mui/material/styles";
 import { importExcel } from "@/api/orderList";
+import { oTrackListImport } from "@/api/oTrackList";
+import CloudDownloadSharpIcon from "@mui/icons-material/CloudDownloadSharp";
 
 const ODD_OPACITY = 0.2;
 
@@ -36,7 +38,8 @@ interface EditDataGridProp {
   onAddRowData: Function;
   onDelHandle: Function;
   pageType?: "user" | "trackingNumber" | "orderManagement" | "dept" | undefined;
-  getRowId?: Function | undefined;
+  DownloadTemplateFile?: Function;
+  getRowId?: any;
 }
 
 const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
@@ -80,6 +83,7 @@ export default function EditDataGrid(opts: EditDataGridProp) {
     onChangeRowData,
     onAddRowData,
     onDelHandle,
+    DownloadTemplateFile,
   } = opts;
   const [inputValues, setInputValues] = useState({
     inputValue1: "",
@@ -113,6 +117,23 @@ export default function EditDataGrid(opts: EditDataGridProp) {
     },
     [onChangeRowData]
   );
+
+  // 下载文件
+  function download(res: any) {
+    const { data, headers } = res;
+    const fileName = "模板文件.xlsx";
+    // 此处当返回json文件时需要先对data进行JSON.stringify处理，其他类型文件不用做处理
+    const blob = new Blob([data], { type: headers["content-type"] });
+    let dom = document.createElement("a");
+    let url = window.URL.createObjectURL(blob);
+    dom.href = url;
+    dom.download = decodeURI(fileName);
+    dom.style.display = "none";
+    document.body.appendChild(dom);
+    dom.click();
+    dom && dom.parentNode && dom.parentNode.removeChild(dom);
+    window.URL.revokeObjectURL(url);
+  }
 
   // 行选中
   const handleRowSelectionModelChange = (selectIds: GridRowSelectionModel) => {
@@ -151,7 +172,7 @@ export default function EditDataGrid(opts: EditDataGridProp) {
   };
 
   // 上传文件
-  const handleFileInputChange = (event) => {
+  const handleFileInputChange = (event: any) => {
     const file = event.target.files[0];
     if (file) {
       const fileType = file.type;
@@ -162,13 +183,23 @@ export default function EditDataGrid(opts: EditDataGridProp) {
         setSnackbar({ children: "请上传 Excel 文件", severity: "warning" } as any);
         event.target.value = "";
       } else {
-        importExcel(file)
-          .then((result) => {
-            debugger;
-          })
-          .catch((error) => {
-            setSnackbar({ children: error.message, severity: "error" } as any);
-          });
+        if (pageType === "orderManagement") {
+          importExcel(file)
+            .then((result) => {
+              setSnackbar({ children: "数据导入成功", severity: "success" } as any);
+            })
+            .catch((error) => {
+              setSnackbar({ children: error.message, severity: "error" } as any);
+            });
+        } else if (pageType === "trackingNumber") {
+          oTrackListImport(file)
+            .then((result) => {
+              setSnackbar({ children: "数据导入成功", severity: "success" } as any);
+            })
+            .catch((error) => {
+              setSnackbar({ children: error.message, severity: "error" } as any);
+            });
+        }
       }
     }
   };
@@ -204,18 +235,32 @@ export default function EditDataGrid(opts: EditDataGridProp) {
         {["user", "dept"].includes(pageType || "") ? (
           ""
         ) : (
-          <Button
-            size="small"
-            component="label"
-            startIcon={
-              <SvgIcon fontSize="small">
-                <FileUploadOutlinedIcon />
-              </SvgIcon>
-            }
-          >
-            导入
-            <input hidden accept=".xls,.xlsx" type="file" onChange={handleFileInputChange} />
-          </Button>
+          <>
+            <Button
+              size="small"
+              component="label"
+              onClick={() => DownloadTemplateFile && DownloadTemplateFile(download)}
+              startIcon={
+                <SvgIcon fontSize="small">
+                  <CloudDownloadSharpIcon />
+                </SvgIcon>
+              }
+            >
+              下载导入模板
+            </Button>
+            <Button
+              size="small"
+              component="label"
+              startIcon={
+                <SvgIcon fontSize="small">
+                  <FileUploadOutlinedIcon />
+                </SvgIcon>
+              }
+            >
+              导入
+              <input hidden accept=".xls,.xlsx" type="file" onChange={handleFileInputChange} />
+            </Button>
+          </>
         )}
 
         <GridToolbarExport

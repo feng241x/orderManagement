@@ -12,7 +12,13 @@ import EditDataGrid from "../sections/editorTable";
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 import { AuthContext, useAuthContext } from "@/contexts/auth-context";
-import { addOTrack, batchDelOTrack, editOTrack, oTrackList } from "@/api/oTrackList";
+import {
+  addOTrack,
+  batchDelOTrack,
+  editOTrack,
+  exportExcelTemplate,
+  oTrackList,
+} from "@/api/oTrackList";
 import { createResourceId } from "@/utils/create-resource-id";
 import { queryRecycleEnum, queryRefundEnum } from "@/api/enumCommon";
 import { GridPreProcessEditCellProps } from "@mui/x-data-grid";
@@ -41,6 +47,11 @@ const Page = () => {
     severity: "error",
   });
   const [columnsFields, setColumnsFields] = useState<any>([]);
+  const DownloadTemplateFile = (download: any) => {
+    exportExcelTemplate().then((response) => {
+      download(response);
+    });
+  };
   // 获取订单数据
   useEffect(() => {
     // 请求数据
@@ -50,12 +61,13 @@ const Page = () => {
   }, [startDate, endDate]);
   // 获取枚举
   useEffect(() => {
-    queryRecycleEnum().then((result) => {
+    queryRecycleEnum().then((result: any) => {
       // 定义列属性
       const defaultColumnsFields = [
         {
           field: "trackingNum",
           headerName: "物流单号",
+          minWidth: 300,
           editable: true,
         },
         {
@@ -63,11 +75,11 @@ const Page = () => {
           headerName: "回收状态",
           editable: true,
           valueOptions: [],
-          minWidth: 120,
+          minWidth: 200,
           type: "singleSelect",
           renderCell: ({ value }: any) => (
             <Chip
-              label={result.find((item) => item["code"] === value)["name"]}
+              label={result.find((item: any) => item["code"] === value)["name"]}
               color={value ? "success" : "default"}
               icon={value ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
             />
@@ -76,11 +88,12 @@ const Page = () => {
         {
           field: "createBy",
           headerName: "录入人",
+          minWidth: 200,
         },
         {
           field: "createTime",
           headerName: "录入时间",
-          minWidth: 150,
+          minWidth: 200,
           type: "dateTime",
           valueFormatter: ({ value }: any) => value && dayjs(value).format("YYYY/MM/DD HH:mm"),
         },
@@ -98,15 +111,6 @@ const Page = () => {
       setColumnsFields(defaultColumnsFields);
     });
   }, []);
-  // 重新查询数据
-  const searchDataHandle = () => {
-    // 获取开始 结束时间
-    const queryParams = {
-      startDate,
-      endDate,
-    };
-    console.log(JSON.stringify(queryParams));
-  };
   // 更新编辑行数据
   const onChangeRowData = async (newData: any) => {
     return await editOTrack(newData);
@@ -114,8 +118,7 @@ const Page = () => {
   // 新增订单
   const onAddRowData = (data: any) => {
     return addOTrack(data).then((result) => {
-      data["id"] = createResourceId();
-      setDatagridData(datagridData.concat([data]));
+      setDatagridData(datagridData.concat([result]));
       return true;
     });
   };
@@ -130,7 +133,7 @@ const Page = () => {
           message: "删除数据成功",
         });
       }
-      setDatagridData(datagridData.filter((item) => !ids.includes(item["id"])));
+      setDatagridData(datagridData.filter((item: any) => !ids.includes(item["id"])));
       return true;
     });
   };
@@ -198,11 +201,13 @@ const Page = () => {
               </Stack>
             </Stack>
             <EditDataGrid
+              pageType="trackingNumber"
               columnsFields={columnsFields}
               datagridData={datagridData}
               onChangeRowData={onChangeRowData}
               onAddRowData={onAddRowData}
               onDelHandle={onDelHandle}
+              DownloadTemplateFile={DownloadTemplateFile}
             />
           </Stack>
           <Snackbar

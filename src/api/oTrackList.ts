@@ -48,8 +48,20 @@ export function editOTrack(params: any) {
  * @param params
  * @returns
  */
-export function importExcel(file: any) {
+export function oTrackListImport(file: any) {
   const formData = new FormData();
   formData.append("file", file);
   return myAxios.post(generateRequestUrl("importExcel"), formData);
+}
+
+/**
+ * 下载订单导入模板
+ * @param params
+ * @returns
+ */
+export function exportExcelTemplate() {
+  return myAxios.get(generateRequestUrl("exportExcelTemplate"), {
+    params: {},
+    responseType: "blob",
+  });
 }

@@ -12,7 +12,13 @@ import EditDataGrid from "../sections/editorTable/";
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 import { AuthContext, useAuthContext } from "@/contexts/auth-context";
-import { addOrder, batchDelOrder, editOrder, orderList } from "@/api/orderList";
+import {
+  addOrder,
+  batchDelOrder,
+  editOrder,
+  exportExcelTemplate,
+  orderList,
+} from "@/api/orderList";
 import { createResourceId } from "@/utils/create-resource-id";
 import { queryRecycleEnum, queryRefundEnum } from "@/api/enumCommon";
 import { GridPreProcessEditCellProps } from "@mui/x-data-grid";
@@ -27,21 +33,25 @@ const now = dayjs();
 const start = now.subtract(3, "day");
 
 const Page = () => {
-  const [datagridData, setDatagridData] = useState([]);
+  const [datagridData, setDatagridData] = useState<any>([]);
   // 开始时间
-  const [startDate, setStartDate] = useState(start);
+  const [startDate, setStartDate] = useState<any>(start);
   // 结束时间
-  const [endDate, setEndDate] = useState(now);
+  const [endDate, setEndDate] = useState<any>(now);
   // 报错弹窗信息
-  const [alertState, setAlertState] = useState({
+  const [alertState, setAlertState] = useState<any>({
     open: false,
     vertical: "top",
     horizontal: "center",
     message: "请输入正确时间",
     severity: "error",
   });
-  const [columnsFields, setColumnsFields] = useState([]);
-
+  const [columnsFields, setColumnsFields] = useState<any>([]);
+  const DownloadTemplateFile = (download: any) => {
+    exportExcelTemplate().then((response) => {
+      download(response);
+    });
+  };
   // 获取订单数据
   useEffect(() => {
     // 请求数据
@@ -52,9 +62,9 @@ const Page = () => {
   // 获取枚举
   useEffect(() => {
     Promise.all([queryRecycleEnum(), queryRefundEnum()]).then((result) => {
-      const [recyclesEnum, refundEnum] = result;
+      const [recyclesEnum, refundEnum]: any = result;
       // 定义列属性
-      const defaultColumnsFields = [
+      const defaultColumnsFields: any = [
         {
           field: "orderNum",
           headerName: "平台单号",
@@ -104,7 +114,7 @@ const Page = () => {
           type: "singleSelect",
           renderCell: ({ value }: any) => (
             <Chip
-              label={recyclesEnum.find((item) => item["code"] === value)["name"]}
+              label={recyclesEnum.find((item: any) => item["code"] === value)["name"]}
               color={value ? "success" : "default"}
               icon={value ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
             />
@@ -118,7 +128,7 @@ const Page = () => {
           type: "singleSelect",
           renderCell: ({ value }: any) => (
             <Chip
-              label={recyclesEnum.find((item) => item["code"] === value)["name"]}
+              label={recyclesEnum.find((item: any) => item["code"] === value)["name"]}
               color={value ? "success" : "default"}
               icon={value ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
             />
@@ -143,11 +153,24 @@ const Page = () => {
             const hasError = /^\d+$/.test(params.props.value);
             return { ...params.props, error: !hasError };
           },
+          valueFormatter: ({ value }: any) => {
+            if (typeof value === "number") {
+              return (
+                "¥ " +
+                value.toLocaleString("zh-CN", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              );
+            } else {
+              return value;
+            }
+          },
         },
       ];
       // 更新回收状态枚举
       const recycleStatus: any = defaultColumnsFields.find(
-        (item) => item["field"] === "recycleStatus"
+        (item: any) => item["field"] === "recycleStatus"
       );
       Object.assign(recycleStatus, {
         valueOptions: recyclesEnum?.map((item: any) => ({
@@ -156,7 +179,7 @@ const Page = () => {
         })),
       });
       const refundStatus: any = defaultColumnsFields.find(
-        (item) => item["field"] === "refundStatus"
+        (item: any) => item["field"] === "refundStatus"
       );
       Object.assign(refundStatus, {
         valueOptions: refundEnum?.map((item: any) => ({
@@ -167,24 +190,14 @@ const Page = () => {
       setColumnsFields(defaultColumnsFields);
     });
   }, []);
-  // 重新查询数据
-  const searchDataHandle = () => {
-    // 获取开始 结束时间
-    const queryParams = {
-      startDate,
-      endDate,
-    };
-    console.log(JSON.stringify(queryParams));
-  };
   // 更新编辑行数据
   const onChangeRowData = async (newData: any) => {
     return await editOrder(newData);
   };
   // 新增订单
   const onAddRowData = (data: any) => {
-    return addOrder(data).then((result) => {
-      data["id"] = createResourceId();
-      setDatagridData(datagridData.concat([data]));
+    return addOrder(data).then((result: any) => {
+      setDatagridData(datagridData.concat([result]));
       return true;
     });
   };
@@ -199,7 +212,7 @@ const Page = () => {
           message: "删除数据成功",
         });
       }
-      setDatagridData(datagridData.filter((item) => !ids.includes(item["id"])));
+      setDatagridData(datagridData.filter((item: any) => !ids.includes(item["id"])));
       return true;
     });
   };
@@ -267,11 +280,13 @@ const Page = () => {
               </Stack>
             </Stack>
             <EditDataGrid
+              pageType="orderManagement"
               columnsFields={columnsFields}
               datagridData={datagridData}
               onChangeRowData={onChangeRowData}
               onAddRowData={onAddRowData}
               onDelHandle={onDelHandle}
+              DownloadTemplateFile={DownloadTemplateFile}
             />
           </Stack>
           <Snackbar
