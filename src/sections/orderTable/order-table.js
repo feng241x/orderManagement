@@ -101,7 +101,6 @@ export const OrderTable = (props) => {
     [rowsData]
   );
   const handleEditRowsModelChange = React.useCallback((model) => {
-    debugger;
     setEditRowsModel(model);
   }, []);
   useEffect(() => {
@@ -141,11 +140,6 @@ export const OrderTable = (props) => {
     });
     setRowsData(rows.list);
   }, []);
-  const onCellEditStop = (row, b, c) => {
-    // 获取关键属性值
-    const { id, field } = row;
-    debugger;
-  };
   return (
     <Card>
       <Scrollbar>

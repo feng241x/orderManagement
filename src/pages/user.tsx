@@ -1,7 +1,7 @@
 import React, { forwardRef, useContext, useEffect, useReducer, useState } from "react";
 import Head from "next/head";
 import TextField from "@mui/material/TextField";
-import { Box, Button, Chip, Container, Stack, Typography } from "@mui/material";
+import { Box, Chip, Container, Stack, Typography } from "@mui/material";
 import { Layout as DashboardLayout } from "../layouts/dashboard/layout";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -11,14 +11,12 @@ import MuiAlert from "@mui/material/Alert";
 import EditDataGrid from "../sections/editorTable/";
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
-import { AuthContext, useAuthContext } from "@/contexts/auth-context";
 import { addUser, batchDelUser, editUser, userList } from "@/api/user";
-import { createResourceId } from "@/utils/create-resource-id";
-import { queryRecycleEnum, queryRefundEnum, queryRoleScopeEnum } from "@/api/enumCommon";
-import { GridPreProcessEditCellProps } from "@mui/x-data-grid";
+import { GridActionsCellItem, GridPreProcessEditCellProps } from "@mui/x-data-grid";
 import CheckCircleSharpIcon from "@mui/icons-material/CheckCircleSharp";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 import { deptList } from "@/api/dept";
+import LockResetSharpIcon from "@mui/icons-material/LockResetSharp";
 
 const Alert = forwardRef(function Alert(props: any, ref: any) {
   return <MuiAlert elevation={3} ref={ref} variant="filled" {...props} />;
@@ -42,7 +40,7 @@ const Page = () => {
     severity: "error",
   });
   const [columnsFields, setColumnsFields] = useState<any>([]);
-
+  const rootPassword = (userId: number) => {};
   // 获取订单数据
   useEffect(() => {
     // 请求数据
@@ -105,6 +103,7 @@ const Page = () => {
           field: "sex",
           headerName: "性别",
           editable: true,
+          type: "singleSelect",
           valueOptions: [
             { label: "女", value: 0 },
             { label: "男", value: 1 },
@@ -135,6 +134,19 @@ const Page = () => {
           minWidth: 150,
           type: "dateTime",
           valueFormatter: ({ value }: any) => value && dayjs(value).format("YYYY/MM/DD HH:mm"),
+        },
+        {
+          field: "actions",
+          type: "actions",
+          width: 80,
+          getActions: (params: any) => [
+            <GridActionsCellItem
+              key={"resetPassword"}
+              icon={<LockResetSharpIcon />}
+              label="重置密码"
+              onClick={() => rootPassword(params.userId)}
+            />,
+          ],
         },
       ];
       // 更新回收状态枚举

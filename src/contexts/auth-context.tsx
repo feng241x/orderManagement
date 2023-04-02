@@ -83,7 +83,6 @@ export const AuthProvider = (props: any) => {
     if (token) {
       // 获取当前用户信息
       const userData: any = await getInfo();
-      debugger;
       if (userData) {
         const userInfo = userData?.userInfo;
         dispatch({
