@@ -12,12 +12,13 @@ import EditDataGrid from "../sections/editorTable/";
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 import { AuthContext, useAuthContext } from "@/contexts/auth-context";
-import { addOrder, batchDelOrder, editOrder, orderList } from "@/api/orderList";
+import { addUser, batchDelUser, editUser, userList } from "@/api/user";
 import { createResourceId } from "@/utils/create-resource-id";
-import { queryRecycleEnum, queryRefundEnum } from "@/api/enumCommon";
+import { queryRecycleEnum, queryRefundEnum, queryRoleScopeEnum } from "@/api/enumCommon";
 import { GridPreProcessEditCellProps } from "@mui/x-data-grid";
 import CheckCircleSharpIcon from "@mui/icons-material/CheckCircleSharp";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
+import { deptList } from "@/api/dept";
 
 const Alert = forwardRef(function Alert(props: any, ref: any) {
   return <MuiAlert elevation={3} ref={ref} variant="filled" {...props} />;
@@ -27,101 +28,110 @@ const now = dayjs();
 const start = now.subtract(3, "day");
 
 const Page = () => {
-  const [datagridData, setDatagridData] = useState([]);
+  const [datagridData, setDatagridData] = useState<any>([]);
   // 开始时间
-  const [startDate, setStartDate] = useState(start);
+  const [startDate, setStartDate] = useState<any>(start);
   // 结束时间
-  const [endDate, setEndDate] = useState(now);
+  const [endDate, setEndDate] = useState<any>(now);
   // 报错弹窗信息
-  const [alertState, setAlertState] = useState({
+  const [alertState, setAlertState] = useState<any>({
     open: false,
     vertical: "top",
     horizontal: "center",
     message: "请输入正确时间",
     severity: "error",
   });
-  const [columnsFields, setColumnsFields] = useState([]);
+  const [columnsFields, setColumnsFields] = useState<any>([]);
 
   // 获取订单数据
   useEffect(() => {
     // 请求数据
-    orderList({ createTimeFrom: startDate, createTimeTo: endDate }).then((result: any) => {
+    userList({ createTimeFrom: startDate, createTimeTo: endDate }).then((result: any) => {
       setDatagridData(result);
     });
   }, [startDate, endDate]);
   // 获取枚举
   useEffect(() => {
-    Promise.all([queryRecycleEnum(), queryRefundEnum()]).then((result) => {
-      const [recyclesEnum, refundEnum] = result;
+    deptList().then((deptDataList: any[]) => {
+      debugger;
       // 定义列属性
       const defaultColumnsFields = [
         {
-          field: "orderNum",
-          headerName: "平台单号",
-          minWidth: 100,
+          field: "userId",
+          headerName: "id",
+          hide: true,
+        },
+        {
+          field: "userName",
+          headerName: "账号",
+        },
+        {
+          field: "nickName",
+          headerName: "姓名",
           editable: true,
         },
         {
-          field: "zfbNum",
-          headerName: "支付宝账号",
+          field: "deptId",
+          headerName: "部门名称",
           editable: true,
         },
         {
-          field: "zfbUser",
-          headerName: "支付宝户主",
+          field: "deptName",
+          headerName: "部门名称",
+          hide: true,
+        },
+        {
+          field: "email",
+          headerName: "邮箱",
+          editable: true,
+          preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+            const hasError = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i.test(
+              params.props.value
+            );
+            return { ...params.props, error: !hasError };
+          },
+        },
+        {
+          field: "mobile",
+          headerName: "手机",
+          editable: true,
+          preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+            const hasError = /^1[3-9]\d{9}$/.test(params.props.value);
+            return { ...params.props, error: !hasError };
+          },
+        },
+        {
+          field: "remark",
+          headerName: "备注",
           editable: true,
         },
         {
-          field: "accountNum",
-          headerName: "平台账号",
+          field: "sex",
+          headerName: "性别",
           editable: true,
+          valueOptions: [
+            { label: "女", value: 0 },
+            { label: "男", value: 1 },
+          ],
+          renderCell: ({ value }: any) => (value ? "男" : "女"),
         },
         {
-          field: "wxNum",
-          headerName: "微信号",
-          editable: true,
-        },
-        {
-          field: "trackingNum",
-          headerName: "物流单号",
-          editable: true,
-        },
-        {
-          field: "promoteProduct",
-          headerName: "推广产品",
-          editable: true,
-        },
-        {
-          field: "recycleStatus",
-          headerName: "回收状态",
+          field: "status",
+          headerName: "状态",
           minWidth: 120,
           editable: true,
           type: "singleSelect",
+          valueOptions: [
+            { label: "禁用", value: 0 },
+            { label: "启用", value: 1 },
+          ],
           renderCell: ({ value }: any) => (
             <Chip
-              label={recyclesEnum.find((item) => item["code"] === value)["name"]}
+              label={value ? "启用" : "禁用"}
               color={value ? "success" : "default"}
               icon={value ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
             />
           ),
-        },
-        {
-          field: "refundStatus",
-          headerName: "返款状态",
-          minWidth: 120,
-          editable: true,
-          type: "singleSelect",
-          renderCell: ({ value }: any) => (
-            <Chip
-              label={recyclesEnum.find((item) => item["code"] === value)["name"]}
-              color={value ? "success" : "default"}
-              icon={value ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
-            />
-          ),
-        },
-        {
-          field: "promoter",
-          headerName: "推广人",
         },
         {
           field: "createTime",
@@ -130,73 +140,57 @@ const Page = () => {
           type: "dateTime",
           valueFormatter: ({ value }: any) => value && dayjs(value).format("YYYY/MM/DD HH:mm"),
         },
-        {
-          field: "amount",
-          headerName: "金额",
-          editable: true,
-          preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-            const hasError = /^\d+$/.test(params.props.value);
-            return { ...params.props, error: !hasError };
-          },
-        },
       ];
       // 更新回收状态枚举
-      const recycleStatus: any = defaultColumnsFields.find(
-        (item) => item["field"] === "recycleStatus"
-      );
-      Object.assign(recycleStatus, {
-        valueOptions: recyclesEnum?.map((item: any) => ({
-          value: item["code"],
-          label: item["name"],
+      const deptListEnum: any = defaultColumnsFields.find((item) => item["field"] === "deptId");
+      Object.assign(deptListEnum, {
+        valueOptions: deptDataList?.map((item: any) => ({
+          value: item["deptId"],
+          label: item["deptName"],
         })),
-      });
-      const refundStatus: any = defaultColumnsFields.find(
-        (item) => item["field"] === "refundStatus"
-      );
-      Object.assign(refundStatus, {
-        valueOptions: refundEnum?.map((item: any) => ({
-          value: item["code"],
-          label: item["name"],
-        })),
+        // valueParser: (value, params) => {
+        //   const deptData = deptDataList.find((item) => item["deptId"] === value);
+        //   return 333;
+        // },
       });
       setColumnsFields(defaultColumnsFields);
     });
   }, []);
-  // 重新查询数据
-  const searchDataHandle = () => {
-    // 获取开始 结束时间
-    const queryParams = {
-      startDate,
-      endDate,
-    };
-    console.log(JSON.stringify(queryParams));
-  };
   // 更新编辑行数据
   const onChangeRowData = async (newData: any) => {
-    return await editOrder(newData);
+    return await editUser(newData);
   };
   // 新增订单
   const onAddRowData = (data: any) => {
-    return addOrder(data).then((result) => {
-      data["id"] = createResourceId();
+    return addUser(data).then((result) => {
+      data["userId"] = createResourceId();
       setDatagridData(datagridData.concat([data]));
       return true;
     });
   };
   // 删除订单
   const onDelHandle = (ids: number[]) => {
-    return batchDelOrder(ids.join(",")).then((result) => {
-      if (result) {
+    return batchDelUser(ids.join(","))
+      .then((result) => {
+        if (result) {
+          setAlertState({
+            ...alertState,
+            open: true,
+            severity: "success",
+            message: "删除数据成功",
+          });
+        }
+        setDatagridData(datagridData.filter((item: any) => !ids.includes(item["userId"])));
+        return true;
+      })
+      .catch((error) => {
         setAlertState({
           ...alertState,
           open: true,
-          severity: "success",
-          message: "删除数据成功",
+          severity: "error",
+          message: error.message,
         });
-      }
-      setDatagridData(datagridData.filter((item) => !ids.includes(item["id"])));
-      return true;
-    });
+      });
   };
   const handleClose = () => {
     setAlertState({ ...alertState, open: false });
@@ -206,7 +200,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>订单管理 | 订单管理系统</title>
+        <title>用户管理里 | 订单管理系统</title>
       </Head>
       <Box
         component="main"
@@ -219,7 +213,7 @@ const Page = () => {
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={3}>
-                <Typography variant="h4">订单管理</Typography>
+                <Typography variant="h4">用户管理</Typography>
                 <Stack alignItems="center" direction="row" spacing={3}>
                   <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"zh-cn"}>
                     <DatePicker
@@ -263,10 +257,12 @@ const Page = () => {
             </Stack>
             <EditDataGrid
               columnsFields={columnsFields}
+              pageType={"user"}
               datagridData={datagridData}
               onChangeRowData={onChangeRowData}
               onAddRowData={onAddRowData}
               onDelHandle={onDelHandle}
+              getRowId={(item: any) => item["userId"]}
             />
           </Stack>
           <Snackbar

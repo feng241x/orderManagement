@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from "react";
 import PropTypes from "prop-types";
-import { myAxios } from "@/api";
-import { setToken } from "@/utils";
+import { getInfo, myAxios } from "@/api";
+import { removeToken, setToken } from "@/utils";
 import router from "next/router";
 
 const HANDLERS = {
@@ -60,7 +60,6 @@ const reducer = (state: string, action: any) =>
 export const AuthContext = createContext({ undefined });
 
 export const AuthProvider = (props: any) => {
-  debugger;
   const { children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
   const initialized = useRef(false);
@@ -73,26 +72,26 @@ export const AuthProvider = (props: any) => {
 
     initialized.current = true;
 
-    let isAuthenticated = false;
+    let token = "";
 
     try {
-      isAuthenticated = window.sessionStorage.getItem("authenticated") === "true";
+      token = localStorage.getItem("token") || "";
     } catch (err) {
       console.error(err);
     }
 
-    if (isAuthenticated) {
-      const user = {
-        id: "5e86809283e28b96d2d38537",
-        avatar: "/assets/avatars/avatar-anika-visser.png",
-        name: "Anika Visser",
-        email: "anika.visser@devias.io",
-      };
-
-      dispatch({
-        type: HANDLERS.INITIALIZE,
-        payload: user,
-      });
+    if (token) {
+      // 获取当前用户信息
+      const userData: any = await getInfo();
+      const userInfo = userData?.userInfo;
+      if (userInfo) {
+        dispatch({
+          type: HANDLERS.INITIALIZE,
+          payload: userInfo,
+        });
+      } else {
+        signOut();
+      }
     } else {
       dispatch({
         type: HANDLERS.INITIALIZE,
@@ -108,42 +107,19 @@ export const AuthProvider = (props: any) => {
     []
   );
 
-  const skip = () => {
-    try {
-      window.sessionStorage.setItem("authenticated", "true");
-    } catch (err) {
-      console.error(err);
-    }
-
-    const user = {
-      id: "5e86809283e28b96d2d38537",
-      avatar: "/assets/avatars/avatar-anika-visser.png",
-      name: "Anika Visser",
-      email: "anika.visser@devias.io",
-    };
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user,
-    });
-  };
-
   const signIn = async (username: string, password: string) => {
-    debugger;
     // 登录接口逻辑
     return myAxios
-      .post("http://fhhviv.natappfree.cc/login", {
+      .post("/login", {
         username,
         password,
       })
-      .then((token: any) => {
+      .then(async (token: any) => {
+        if (!token) return;
         setToken(token);
-        const user = {
-          id: "5e86809283e28b96d2d38537",
-          avatar: "/assets/avatars/avatar-anika-visser.png",
-          name: "Anika Visser",
-          email: "anika.visser@devias.io",
-        };
+        // 获取当前用户信息
+        const userData = await getInfo();
+        const user = userData["userInfo"];
         dispatch({
           type: HANDLERS.SIGN_IN,
           payload: user,
@@ -152,15 +128,16 @@ export const AuthProvider = (props: any) => {
         return true;
       })
       .catch((error) => {
-        return false;
+        throw new Error(error.message);
       });
   };
 
-  const signUp = async (email, name, password) => {
+  const signUp = () => {
     throw new Error("Sign up is not implemented");
   };
 
   const signOut = () => {
+    removeToken();
     dispatch({
       type: HANDLERS.SIGN_OUT,
     });
@@ -170,7 +147,6 @@ export const AuthProvider = (props: any) => {
     <AuthContext.Provider
       value={{
         ...state,
-        skip,
         signIn,
         signUp,
         signOut,

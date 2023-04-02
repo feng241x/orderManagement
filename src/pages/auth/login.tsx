@@ -26,7 +26,7 @@ const Page = () => {
     }),
     onSubmit: async (values, helpers) => {
       try {
-        auth.signIn(values.username, values.password).finally((result: boolean) => {
+        await auth.signIn(values.username, values.password).then((result: boolean) => {
           if (result) router.push("/orderManagement");
         });
       } catch (err: any) {
@@ -97,7 +97,6 @@ const Page = () => {
                     value={formik.values.password}
                   />
                 </Stack>
-                {/* <FormHelperText sx={{ mt: 1 }}>Optionally you can skip.</FormHelperText> */}
                 {formik.errors.submit && (
                   <Typography color="error" sx={{ mt: 3 }} variant="body2">
                     {formik.errors.submit}
@@ -106,11 +105,6 @@ const Page = () => {
                 <Button fullWidth size="large" sx={{ mt: 3 }} type="submit" variant="contained">
                   登录
                 </Button>
-                {/* <Alert color="primary" severity="info" sx={{ mt: 3 }}>
-                  <div>
-                    You can use <b>demo@devias.io</b> and password <b>Password123!</b>
-                  </div>
-                </Alert> */}
               </form>
             )}
           </div>

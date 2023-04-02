@@ -25,7 +25,7 @@ export const items = [
   },
   {
     title: "用户管理",
-    path: "/abc",
+    path: "/user",
     icon: (
       <SvgIcon fontSize="small">
         <UsersIcon />
@@ -34,7 +34,7 @@ export const items = [
   },
   {
     title: "部门管理",
-    path: "/def",
+    path: "/dept",
     icon: (
       <SvgIcon fontSize="small">
         <LockClosedIcon />

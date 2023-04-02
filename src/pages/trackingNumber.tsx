@@ -1,58 +1,103 @@
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef, useContext, useEffect, useReducer, useState } from "react";
 import Head from "next/head";
 import TextField from "@mui/material/TextField";
-import { Box, Button, Container, Stack, Typography } from "@mui/material";
+import { Box, Button, Chip, Container, Stack, Typography } from "@mui/material";
 import { Layout as DashboardLayout } from "../layouts/dashboard/layout";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import EditDataGrid from "../sections/editorTable/";
+import EditDataGrid from "../sections/editorTable";
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
+import { AuthContext, useAuthContext } from "@/contexts/auth-context";
+import { addOTrack, batchDelOTrack, editOTrack, oTrackList } from "@/api/oTrackList";
+import { createResourceId } from "@/utils/create-resource-id";
+import { queryRecycleEnum, queryRefundEnum } from "@/api/enumCommon";
+import { GridPreProcessEditCellProps } from "@mui/x-data-grid";
+import CheckCircleSharpIcon from "@mui/icons-material/CheckCircleSharp";
+import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 
-const Alert: any = forwardRef(function Alert(props, ref: any) {
+const Alert = forwardRef(function Alert(props: any, ref: any) {
   return <MuiAlert elevation={3} ref={ref} variant="filled" {...props} />;
 });
 
 const now = dayjs();
 const start = now.subtract(3, "day");
 
-// 定义列属性
-const columnsFields = [
-  {
-    field: "trackingNumber",
-    title: "物流单号",
-    editable: true,
-  },
-  {
-    field: "promoter",
-    title: "录入人",
-  },
-  {
-    field: "createTime",
-    title: "录入时间",
-  },
-  {
-    field: "recoveryState",
-    title: "回收状态",
-    editable: true,
-  },
-];
-
 const Page = () => {
+  const [datagridData, setDatagridData] = useState<any>([]);
   // 开始时间
-  const [startDate, setStartDate] = useState(start);
+  const [startDate, setStartDate] = useState<any>(start);
   // 结束时间
-  const [endDate, setEndDate] = useState(now);
+  const [endDate, setEndDate] = useState<any>(now);
   // 报错弹窗信息
-  const [alertState, setAlertState] = useState({
+  const [alertState, setAlertState] = useState<any>({
     open: false,
     vertical: "top",
     horizontal: "center",
     message: "请输入正确时间",
+    severity: "error",
   });
+  const [columnsFields, setColumnsFields] = useState<any>([]);
+  // 获取订单数据
+  useEffect(() => {
+    // 请求数据
+    oTrackList({ createTimeFrom: startDate, createTimeTo: endDate }).then((result: any) => {
+      setDatagridData(result);
+    });
+  }, [startDate, endDate]);
+  // 获取枚举
+  useEffect(() => {
+    queryRecycleEnum().then((result) => {
+      // 定义列属性
+      const defaultColumnsFields = [
+        {
+          field: "trackingNum",
+          headerName: "物流单号",
+          editable: true,
+        },
+        {
+          field: "recycleStatus",
+          headerName: "回收状态",
+          editable: true,
+          valueOptions: [],
+          minWidth: 120,
+          type: "singleSelect",
+          renderCell: ({ value }: any) => (
+            <Chip
+              label={result.find((item) => item["code"] === value)["name"]}
+              color={value ? "success" : "default"}
+              icon={value ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
+            />
+          ),
+        },
+        {
+          field: "createBy",
+          headerName: "录入人",
+        },
+        {
+          field: "createTime",
+          headerName: "录入时间",
+          minWidth: 150,
+          type: "dateTime",
+          valueFormatter: ({ value }: any) => value && dayjs(value).format("YYYY/MM/DD HH:mm"),
+        },
+      ];
+      // 更新回收状态枚举
+      const recycleStatus: any = defaultColumnsFields.find(
+        (item) => item["field"] === "recycleStatus"
+      );
+      Object.assign(recycleStatus, {
+        valueOptions: result?.map((item: any) => ({
+          value: item["code"],
+          label: item["name"],
+        })),
+      });
+      setColumnsFields(defaultColumnsFields);
+    });
+  }, []);
   // 重新查询数据
   const searchDataHandle = () => {
     // 获取开始 结束时间
@@ -62,6 +107,33 @@ const Page = () => {
     };
     console.log(JSON.stringify(queryParams));
   };
+  // 更新编辑行数据
+  const onChangeRowData = async (newData: any) => {
+    return await editOTrack(newData);
+  };
+  // 新增订单
+  const onAddRowData = (data: any) => {
+    return addOTrack(data).then((result) => {
+      data["id"] = createResourceId();
+      setDatagridData(datagridData.concat([data]));
+      return true;
+    });
+  };
+  // 删除订单
+  const onDelHandle = (ids: number[]) => {
+    return batchDelOTrack(ids.join(",")).then((result) => {
+      if (result) {
+        setAlertState({
+          ...alertState,
+          open: true,
+          severity: "success",
+          message: "删除数据成功",
+        });
+      }
+      setDatagridData(datagridData.filter((item) => !ids.includes(item["id"])));
+      return true;
+    });
+  };
   const handleClose = () => {
     setAlertState({ ...alertState, open: false });
   };
@@ -70,7 +142,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>物流订单 | 订单管理系统</title>
+        <title>物流单管理 | 订单管理系统</title>
       </Head>
       <Box
         component="main"
@@ -83,7 +155,7 @@ const Page = () => {
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={3}>
-                <Typography variant="h4">物流订单</Typography>
+                <Typography variant="h4">物流单管理</Typography>
                 <Stack alignItems="center" direction="row" spacing={3}>
                   <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"zh-cn"}>
                     <DatePicker
@@ -118,14 +190,20 @@ const Page = () => {
                       }}
                       renderInput={(params) => <TextField {...params} />}
                     />
-                    <Button onClick={searchDataHandle} color="primary" variant="contained">
+                    {/* <Button onClick={searchDataHandle} color="primary" variant="contained">
                       查询
-                    </Button>
+                    </Button> */}
                   </LocalizationProvider>
                 </Stack>
               </Stack>
             </Stack>
-            <EditDataGrid columnsFields={columnsFields} />
+            <EditDataGrid
+              columnsFields={columnsFields}
+              datagridData={datagridData}
+              onChangeRowData={onChangeRowData}
+              onAddRowData={onAddRowData}
+              onDelHandle={onDelHandle}
+            />
           </Stack>
           <Snackbar
             anchorOrigin={{ vertical, horizontal }}
@@ -135,7 +213,7 @@ const Page = () => {
             autoHideDuration={6000}
             key={vertical + horizontal}
           >
-            <Alert severity="error">{message}</Alert>
+            <Alert severity={alertState.severity}>{message}</Alert>
           </Snackbar>
         </Container>
       </Box>
