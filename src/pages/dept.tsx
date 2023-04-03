@@ -208,7 +208,9 @@ const Page = () => {
             autoHideDuration={6000}
             key={vertical + horizontal}
           >
-            <Alert severity={alertState.severity}>{message}</Alert>
+            <Alert sx={{ color: "#fff" }} severity={alertState.severity}>
+              {message}
+            </Alert>
           </Snackbar>
         </Container>
       </Box>

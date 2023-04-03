@@ -438,7 +438,12 @@ export default function EditDataGrid(opts: EditDataGridProp) {
           onClose={handleCloseSnackbar}
           autoHideDuration={6000}
         >
-          <Alert {...snackbar} variant="filled" onClose={handleCloseSnackbar} />
+          <Alert
+            {...snackbar}
+            sx={{ color: "#fff" }}
+            variant="filled"
+            onClose={handleCloseSnackbar}
+          />
         </Snackbar>
       )}
     </div>
