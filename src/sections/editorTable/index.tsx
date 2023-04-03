@@ -163,6 +163,21 @@ export default function EditDataGrid(opts: EditDataGridProp) {
     // 有验证规则的字段进行验证
     const column = columnsFields.find((item) => item["field"] === name);
     if (!column) return false;
+    // 必填字段验证
+    if (column["required"] && !inputValue) {
+      setErrors((prevErrors: any) => ({
+        ...prevErrors,
+        [name]: column["errorMsg"],
+      }));
+      return;
+    }
+    if (!column["required"] && inputValue === "") {
+      setErrors((prevErrors: any) => ({
+        ...prevErrors,
+        [`${name.replace("inputValue", "errorText")}`]: "",
+      }));
+      return;
+    }
     const regex = column["regex"];
     if (!regex) return false;
     if (!regex.test(inputValue)) {
@@ -374,8 +389,8 @@ export default function EditDataGrid(opts: EditDataGridProp) {
                         value={inputValues[field]}
                         onChange={handleInputChange}
                         onBlur={() => handleInputBlur(field)}
-                        error={Boolean(errors[field])}
-                        helperText={errors[field]}
+                        error={inputValues[field] && Boolean(errors[field])}
+                        helperText={inputValues[field] && errors[field]}
                       >
                         {column.hasOwnProperty("valueOptions") &&
                           column?.valueOptions.map((option: any) => (

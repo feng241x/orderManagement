@@ -70,6 +70,7 @@ const Page = () => {
           headerName: "平台单号",
           minWidth: 100,
           editable: true,
+          required: true,
         },
         {
           field: "zfbNum",
@@ -144,6 +145,7 @@ const Page = () => {
           field: "amount",
           headerName: "金额",
           editable: true,
+          required: true,
           preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
             const hasError = /^\d+$/.test(params.props.value);
             return { ...params.props, error: !hasError };

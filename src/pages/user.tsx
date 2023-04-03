@@ -78,6 +78,7 @@ const Page = () => {
           field: "userName",
           width: 120,
           headerName: "账号",
+          required: true,
         },
         {
           field: "nickName",
@@ -103,6 +104,8 @@ const Page = () => {
             );
             return { ...params.props, error: !hasError };
           },
+          regex: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i,
+          errorMsg: "请输入正确的邮箱格式",
         },
         {
           field: "mobile",
@@ -113,6 +116,8 @@ const Page = () => {
             const hasError = /^1[3-9]\d{9}$/.test(params.props.value);
             return { ...params.props, error: !hasError };
           },
+          regex: /^1[3-9]\d{9}$/,
+          errorMsg: "请输入正确的手机号",
         },
         {
           field: "remark",
@@ -136,6 +141,7 @@ const Page = () => {
           headerName: "状态",
           minWidth: 120,
           editable: true,
+          required: true,
           type: "singleSelect",
           valueOptions: [
             { label: "禁用", value: 0 },

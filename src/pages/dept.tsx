@@ -60,10 +60,7 @@ const Page = () => {
             headerName: "部门名称",
             minWidth: 200,
             editable: true,
-            YupObj: {
-              type: "text",
-              required: true,
-            },
+            required: true,
           },
           {
             field: "status",

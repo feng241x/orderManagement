@@ -69,11 +69,13 @@ const Page = () => {
           headerName: "物流单号",
           minWidth: 300,
           editable: true,
+          required: true,
         },
         {
           field: "recycleStatus",
           headerName: "回收状态",
           editable: true,
+          required: true,
           valueOptions: [],
           minWidth: 200,
           type: "singleSelect",
