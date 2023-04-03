@@ -70,11 +70,6 @@ const Page = () => {
           headerName: "平台单号",
           minWidth: 100,
           editable: true,
-          TextOptions: {
-            validate: true,
-            helperText: "请输入正确单号",
-            error: () => {},
-          },
         },
         {
           field: "zfbNum",
@@ -166,6 +161,8 @@ const Page = () => {
               return value;
             }
           },
+          regex: /^\d+$/,
+          errorMsg: "请输入正确的格式",
         },
       ];
       // 更新回收状态枚举

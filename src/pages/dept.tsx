@@ -60,6 +60,10 @@ const Page = () => {
             headerName: "部门名称",
             minWidth: 200,
             editable: true,
+            YupObj: {
+              type: "text",
+              required: true,
+            },
           },
           {
             field: "status",
@@ -68,14 +72,14 @@ const Page = () => {
             editable: true,
             type: "singleSelect",
             valueOptions: [
-              { label: "禁用", value: 0 },
-              { label: "启用", value: 1 },
+              { label: "禁用", value: "0" },
+              { label: "启用", value: "1" },
             ],
             renderCell: ({ value }: any) => (
               <Chip
-                label={value ? "启用" : "禁用"}
-                color={value ? "success" : "default"}
-                icon={value ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
+                label={value === "1" ? "启用" : "禁用"}
+                color={value === "1" ? "success" : "default"}
+                icon={value === "1" ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
               />
             ),
           },
@@ -134,7 +138,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>用户管理里 | 订单管理系统</title>
+        <title>部门管理 | 订单管理系统</title>
       </Head>
       <Box
         component="main"
@@ -147,7 +151,7 @@ const Page = () => {
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={3}>
-                <Typography variant="h4">用户管理</Typography>
+                <Typography variant="h4">部门管理</Typography>
                 <Stack alignItems="center" direction="row" spacing={3}>
                   <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"zh-cn"}>
                     <DatePicker

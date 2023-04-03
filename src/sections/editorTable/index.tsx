@@ -2,7 +2,6 @@ import * as React from "react";
 import { useEffect, useState, useCallback } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import Mock from "mockjs";
 import { Button, DialogContentText, Grid, MenuItem, SvgIcon } from "@mui/material";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -28,6 +27,8 @@ import { alpha, styled } from "@mui/material/styles";
 import { importExcel } from "@/api/orderList";
 import { oTrackListImport } from "@/api/oTrackList";
 import CloudDownloadSharpIcon from "@mui/icons-material/CloudDownloadSharp";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const ODD_OPACITY = 0.2;
 
@@ -74,7 +75,6 @@ const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
 }));
 
 export default function EditDataGrid(opts: EditDataGridProp) {
-  const [columns, setColumns] = useState<any>([]);
   const {
     columnsFields,
     pageType,
@@ -85,20 +85,14 @@ export default function EditDataGrid(opts: EditDataGridProp) {
     onDelHandle,
     DownloadTemplateFile,
   } = opts;
-  const [inputValues, setInputValues] = useState({
-    inputValue1: "",
-    inputValue2: "",
-  });
-  const [errors, setErrors] = useState({
-    errorText1: "",
-    errorText2: "",
-  });
+  const [inputValues, setInputValues] = useState<any>({});
+  const [errors, setErrors] = useState<any>({});
   // 新增订单弹窗状态管理
   const [openDialog, setOpenDialog] = useState(false);
   // 删除数据警告弹窗
   const [openDelDialog, setOpenDelDialog] = useState(false);
   const [rowsData, setRowsData] = useState<any>([]);
-  const { register, handleSubmit, formState } = useForm();
+  const { handleSubmit, formState } = useForm();
   // 当前表格选中项
   const [selectIds, setSelectIds] = useState<any>([]);
 
@@ -145,14 +139,48 @@ export default function EditDataGrid(opts: EditDataGridProp) {
   }, []);
 
   useEffect(() => {
-    // 设置列表列头
-    setColumns(columnsFields);
     setRowsData(datagridData);
+    let inputValues: any = {},
+      errors: any = {};
+    columnsFields.forEach((item: any) => {
+      inputValues[item["field"]] = "";
+      errors[item["field"]] = item["errorMsg"];
+    });
+    setInputValues(inputValues);
+    setErrors(errors);
   }, [columnsFields, datagridData]);
+
+  const handleInputChange = (event: any) => {
+    const { name, value } = event.target;
+    setInputValues((prevInputValues: any) => ({
+      ...prevInputValues,
+      [name]: value,
+    }));
+  };
+
+  const handleInputBlur = (name: any) => {
+    const inputValue = inputValues[name];
+    // 有验证规则的字段进行验证
+    const column = columnsFields.find((item) => item["field"] === name);
+    if (!column) return false;
+    const regex = column["regex"];
+    if (!regex) return false;
+    if (!regex.test(inputValue)) {
+      setErrors((prevErrors: any) => ({
+        ...prevErrors,
+        [name]: column["errorMsg"],
+      }));
+    } else {
+      setErrors((prevErrors: any) => ({
+        ...prevErrors,
+        [`${name.replace("inputValue", "errorText")}`]: "",
+      }));
+    }
+  };
 
   // 提交新建表单
   const onSubmit = async (data: any) => {
-    const result = await onAddRowData(data);
+    const result = await onAddRowData(inputValues);
     if (result) {
       // 新建成功 关闭弹窗
       handleCloseDialog();
@@ -298,7 +326,7 @@ export default function EditDataGrid(opts: EditDataGridProp) {
         checkboxSelection
         rows={rowsData}
         getRowId={getRowId}
-        columns={columns}
+        columns={columnsFields}
         initialState={{
           pagination: {
             paginationModel: {
@@ -332,26 +360,33 @@ export default function EditDataGrid(opts: EditDataGridProp) {
                 .filter((column) => {
                   return column["editable"] || column["field"] === "userName";
                 })
-                .map((column: any) => (
-                  <Grid item xs={6} key={column["field"]}>
-                    <TextField
-                      label={column["headerName"]}
-                      select={column.hasOwnProperty("valueOptions")}
-                      fullWidth
-                      margin="dense"
-                      {...register(column["field"], {
-                        required: column["required"],
-                      })}
-                    >
-                      {column.hasOwnProperty("valueOptions") &&
-                        column?.valueOptions.map((option: any) => (
-                          <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                    </TextField>
-                  </Grid>
-                ))}
+                .map((column: any) => {
+                  const field = column["field"];
+                  return (
+                    <Grid item xs={6} key={field}>
+                      <TextField
+                        label={column["headerName"]}
+                        select={column.hasOwnProperty("valueOptions")}
+                        fullWidth
+                        margin="dense"
+                        required={column["required"]}
+                        name={field}
+                        value={inputValues[field]}
+                        onChange={handleInputChange}
+                        onBlur={() => handleInputBlur(field)}
+                        error={Boolean(errors[field])}
+                        helperText={errors[field]}
+                      >
+                        {column.hasOwnProperty("valueOptions") &&
+                          column?.valueOptions.map((option: any) => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.label}
+                            </MenuItem>
+                          ))}
+                      </TextField>
+                    </Grid>
+                  );
+                })}
             </Grid>
           </DialogContent>
           <DialogActions>

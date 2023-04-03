@@ -11,12 +11,14 @@ import MuiAlert from "@mui/material/Alert";
 import EditDataGrid from "../sections/editorTable/";
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
-import { addUser, batchDelUser, editUser, userList } from "@/api/user";
+import { addUser, batchDelUser, editUser, resetPassword, userList } from "@/api/user";
 import { GridActionsCellItem, GridPreProcessEditCellProps } from "@mui/x-data-grid";
 import CheckCircleSharpIcon from "@mui/icons-material/CheckCircleSharp";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 import { deptList } from "@/api/dept";
 import LockResetSharpIcon from "@mui/icons-material/LockResetSharp";
+import ToggleOffIcon from "@mui/icons-material/ToggleOff";
+import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 
 const Alert = forwardRef(function Alert(props: any, ref: any) {
   return <MuiAlert elevation={3} ref={ref} variant="filled" {...props} />;
@@ -40,7 +42,26 @@ const Page = () => {
     severity: "error",
   });
   const [columnsFields, setColumnsFields] = useState<any>([]);
-  const rootPassword = (userId: number) => {};
+  const rootPassword = (userId: string) => {
+    resetPassword(userId)
+      .then((result: any) => {
+        setAlertState({
+          ...alertState,
+          open: true,
+          severity: "success",
+          message: `账号密码已重置为${result}`,
+        });
+      })
+      .catch((error: any) => {
+        setAlertState({
+          ...alertState,
+          open: true,
+          severity: "error",
+          message: error.message,
+        });
+      });
+  };
+  const stateManagement = (userId: number) => {};
   // 获取订单数据
   useEffect(() => {
     // 请求数据
@@ -105,10 +126,10 @@ const Page = () => {
           editable: true,
           type: "singleSelect",
           valueOptions: [
-            { label: "女", value: 0 },
-            { label: "男", value: 1 },
+            { label: "女", value: "0" },
+            { label: "男", value: "1" },
           ],
-          renderCell: ({ value }: any) => (value ? "男" : "女"),
+          renderCell: ({ value }: any) => (value === "1" ? "男" : "女"),
         },
         {
           field: "status",
@@ -122,9 +143,9 @@ const Page = () => {
           ],
           renderCell: ({ value }: any) => (
             <Chip
-              label={value ? "启用" : "禁用"}
-              color={value ? "success" : "default"}
-              icon={value ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
+              label={value === "1" ? "启用" : "禁用"}
+              color={value === "1" ? "success" : "default"}
+              icon={value === "1" ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
             />
           ),
         },
@@ -140,11 +161,17 @@ const Page = () => {
           type: "actions",
           width: 80,
           getActions: (params: any) => [
+            // <GridActionsCellItem
+            //   key={"stateManagement"}
+            //   icon={params.status === "0" ? <ToggleOffIcon /> : <ToggleOnIcon />}
+            //   label={params.status === "0" ? "启用" : "禁用"}
+            //   onClick={() => stateManagement(params.id)}
+            // />,
             <GridActionsCellItem
               key={"resetPassword"}
               icon={<LockResetSharpIcon />}
               label="重置密码"
-              onClick={() => rootPassword(params.userId)}
+              onClick={() => rootPassword(params.id)}
             />,
           ],
         },
@@ -203,7 +230,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>用户管理里 | 订单管理系统</title>
+        <title>用户管理 | 订单管理系统</title>
       </Head>
       <Box
         component="main"
@@ -227,6 +254,7 @@ const Page = () => {
                           setAlertState({
                             ...alertState,
                             open: true,
+                            severity: "error",
                             message: "开始时间不能大于结束时间!",
                           });
                           return;
@@ -243,6 +271,7 @@ const Page = () => {
                           setAlertState({
                             ...alertState,
                             open: true,
+                            severity: "error",
                             message: "结束时间不能小于开始时间!",
                           });
                           return;
@@ -276,7 +305,9 @@ const Page = () => {
             autoHideDuration={6000}
             key={vertical + horizontal}
           >
-            <Alert severity={alertState.severity}>{message}</Alert>
+            <Alert sx={{ color: "#fff" }} severity={alertState.severity}>
+              {message}
+            </Alert>
           </Snackbar>
         </Container>
       </Box>

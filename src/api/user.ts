@@ -44,3 +44,14 @@ export function batchDelUser(userId: string) {
 export function editUser(params: any) {
   return myAxios.post(generateRequestUrl("updateUserInfoByAdmin"), params);
 }
+
+/**
+ * 重置用户密码
+ * @param params
+ * @returns
+ */
+ export function resetPassword(userId: string) {
+  return myAxios.post(generateRequestUrl("resetPassword"), {
+    userId
+  });
+}
