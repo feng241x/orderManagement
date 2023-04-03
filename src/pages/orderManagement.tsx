@@ -124,7 +124,7 @@ const Page = () => {
           type: "singleSelect",
           renderCell: ({ value }: any) => (
             <Chip
-              label={recyclesEnum.find((item: any) => item["code"] === value)["name"]}
+              label={refundEnum.find((item: any) => item["code"] === value)["name"]}
               color={value ? "success" : "default"}
               icon={value ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
             />

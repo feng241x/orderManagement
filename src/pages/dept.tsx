@@ -69,14 +69,14 @@ const Page = () => {
             editable: true,
             type: "singleSelect",
             valueOptions: [
-              { label: "禁用", value: "0" },
-              { label: "启用", value: "1" },
+              { label: "启用", value: "0" },
+              { label: "禁用", value: "1" },
             ],
             renderCell: ({ value }: any) => (
               <Chip
-                label={value === "1" ? "启用" : "禁用"}
-                color={value === "1" ? "success" : "default"}
-                icon={value === "1" ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
+                label={value === "0" ? "启用" : "禁用"}
+                color={value === "0" ? "success" : "default"}
+                icon={value === "0" ? <CheckCircleSharpIcon /> : <CancelSharpIcon />}
               />
             ),
           },
