@@ -3,7 +3,7 @@ import LockClosedIcon from "@heroicons/react/24/solid/LockClosedIcon";
 import ShoppingBagIcon from "@heroicons/react/24/solid/ShoppingBagIcon";
 import UsersIcon from "@heroicons/react/24/solid/UsersIcon";
 import { SvgIcon } from "@mui/material";
-
+import UserIcon from "@heroicons/react/24/solid/UserIcon";
 export const items = [
   {
     title: "订单管理",
@@ -20,6 +20,15 @@ export const items = [
     icon: (
       <SvgIcon fontSize="small">
         <CogIcon />
+      </SvgIcon>
+    ),
+  },
+  {
+    title: "个人资料",
+    path: "/account",
+    icon: (
+      <SvgIcon fontSize="small">
+        <UserIcon />
       </SvgIcon>
     ),
   },

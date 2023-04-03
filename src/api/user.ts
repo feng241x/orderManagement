@@ -50,8 +50,21 @@ export function editUser(params: any) {
  * @param params
  * @returns
  */
- export function resetPassword(userId: string) {
+export function resetPassword(userId: string) {
   return myAxios.post(generateRequestUrl("resetPassword"), {
-    userId
+    userId,
   });
+}
+
+/**
+ * 更新用户密码
+ * @param params
+ * @returns
+ */
+export function changePassword(params: {
+  newPassword: string;
+  oldPassword: string;
+  userId: number;
+}) {
+  return myAxios.post(generateRequestUrl("changePassword"), params);
 }

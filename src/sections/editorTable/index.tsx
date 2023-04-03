@@ -360,7 +360,7 @@ export default function EditDataGrid(opts: EditDataGridProp) {
         open={openDialog}
         onClose={handleCloseDialog}
         scroll={"paper"}
-        maxWidth={"md"}
+        fullWidth={true}
         aria-labelledby="scroll-dialog-title"
         aria-describedby="scroll-dialog-description"
         sx={{
@@ -368,7 +368,7 @@ export default function EditDataGrid(opts: EditDataGridProp) {
         }}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogTitle id="scroll-dialog-title">新建订单</DialogTitle>
+          <DialogTitle id="scroll-dialog-title">新建</DialogTitle>
           <DialogContent dividers={true}>
             <Grid container spacing={2}>
               {columnsFields
