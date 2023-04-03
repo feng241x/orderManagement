@@ -55,7 +55,6 @@ export const AccountProfileDetails = () => {
   }, []);
 
   const handleSubmit = useCallback((event: any) => {
-    console.log(JSON.stringify(values));
     event.preventDefault();
   }, []);
 

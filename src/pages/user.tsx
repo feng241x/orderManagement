@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useEffect, useReducer, useState } from "react";
+import React, { forwardRef, useContext, useEffect, useCallback, useState } from "react";
 import Head from "next/head";
 import TextField from "@mui/material/TextField";
 import { Box, Chip, Container, Stack, Typography } from "@mui/material";
@@ -42,25 +42,6 @@ const Page = () => {
     severity: "error",
   });
   const [columnsFields, setColumnsFields] = useState<any>([]);
-  const rootPassword = (userId: string) => {
-    resetPassword(userId)
-      .then((result: any) => {
-        setAlertState({
-          ...alertState,
-          open: true,
-          severity: "success",
-          message: `账号密码已重置为${result}`,
-        });
-      })
-      .catch((error: any) => {
-        setAlertState({
-          ...alertState,
-          open: true,
-          severity: "error",
-          message: error.message,
-        });
-      });
-  };
   const stateManagement = (userId: number) => {};
   // 获取订单数据
   useEffect(() => {
@@ -69,8 +50,27 @@ const Page = () => {
       setDatagridData(result);
     });
   }, [startDate, endDate]);
-  // 获取枚举
   useEffect(() => {
+    const rootPassword = (userId: string) => {
+      resetPassword(userId)
+        .then((result: any) => {
+          setAlertState({
+            ...alertState,
+            open: true,
+            severity: "success",
+            message: `账号密码已重置为${result}`,
+          });
+        })
+        .catch((error: any) => {
+          setAlertState({
+            ...alertState,
+            open: true,
+            severity: "error",
+            message: error.message,
+          });
+        });
+    };
+    // 在这里调用 rootPassword 函数
     deptList().then((deptDataList: any) => {
       // 定义列属性
       const defaultColumnsFields = [
@@ -192,7 +192,7 @@ const Page = () => {
       });
       setColumnsFields(defaultColumnsFields);
     });
-  }, []);
+  }, [alertState]);
   // 更新编辑行数据
   const onChangeRowData = async (newData: any) => {
     return await editUser(newData);
