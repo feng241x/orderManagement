@@ -89,6 +89,7 @@ export const AuthProvider = (props: any) => {
           type: HANDLERS.INITIALIZE,
           payload: userInfo,
         });
+        router.push("/orderManagement");
       } else {
         signOut();
       }
@@ -124,7 +125,6 @@ export const AuthProvider = (props: any) => {
           type: HANDLERS.SIGN_IN,
           payload: user,
         });
-        router.push("/orderManagement");
         return true;
       })
       .catch((error) => {
