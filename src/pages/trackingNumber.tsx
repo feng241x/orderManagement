@@ -56,7 +56,7 @@ const Page = () => {
   useEffect(() => {
     // 请求数据
     oTrackList({ createTimeFrom: startDate, createTimeTo: endDate }).then((result: any) => {
-      setDatagridData(result);
+      setDatagridData(result || []);
     });
   }, [startDate, endDate]);
   // 获取枚举

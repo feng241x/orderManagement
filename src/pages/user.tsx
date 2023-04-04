@@ -47,7 +47,7 @@ const Page = () => {
   useEffect(() => {
     // 请求数据
     userList({ createTimeFrom: startDate, createTimeTo: endDate }).then((result: any) => {
-      setDatagridData(result);
+      setDatagridData(result || []);
     });
   }, [startDate, endDate]);
   useEffect(() => {
