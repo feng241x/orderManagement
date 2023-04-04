@@ -390,7 +390,7 @@ export default function EditDataGrid(opts: EditDataGridProp) {
                         onChange={handleInputChange}
                         onBlur={() => handleInputBlur(field)}
                         error={Boolean(inputValues[field]) && Boolean(errors[field])}
-                        helperText={inputValues[field] && errors[field]}
+                        helperText={errors[field] && inputValues[field] && errors[field]}
                       >
                         {column.hasOwnProperty("valueOptions") &&
                           column?.valueOptions.map((option: any) => (
