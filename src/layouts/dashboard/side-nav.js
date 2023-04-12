@@ -51,7 +51,7 @@ export const SideNav = (props) => {
         }
       })
     );
-  }, []);
+  }, [routerItems, user.roleId]);
   const content = (
     <Scrollbar
       sx={{
