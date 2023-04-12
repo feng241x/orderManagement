@@ -17,12 +17,41 @@ import { Logo } from "src/components/logo";
 import { Scrollbar } from "src/components/scrollbar";
 import { items } from "./config";
 import { SideNavItem } from "./side-nav-item";
+import { useAuthContext } from "@/contexts/auth-context";
+import { useEffect, useState } from "react";
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-
+  const { user } = useAuthContext();
+  const [routerItems, setRouterItems] = useState(items);
+  useEffect(() => {
+    setRouterItems(
+      routerItems.filter((item) => {
+        switch (user.roleId) {
+          // 管理员
+          case 1:
+            // 管理员账号可以查看所有页面
+            return true;
+          // 数据员
+          case 28:
+          // 部门主管
+          case 29:
+          // 普通用户
+          case 30:
+            // 只能查看订单管理页面
+            return ["/orderManagement", "/account"].includes(item["path"]);
+          // 仓管
+          case 31:
+            // 只能查看订单管理页面
+            return ["/trackingNumber", "/account"].includes(item["path"]);
+          default:
+            return true;
+        }
+      })
+    );
+  }, []);
   const content = (
     <Scrollbar
       sx={{
@@ -80,7 +109,7 @@ export const SideNav = (props) => {
               m: 0,
             }}
           >
-            {items.map((item) => {
+            {routerItems.map((item) => {
               const active = item.path ? pathname === item.path : false;
 
               return (

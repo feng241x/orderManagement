@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useReducer, useRef } from "react"
 import PropTypes from "prop-types";
 import { getInfo, myAxios } from "@/api";
 import { removeToken, setToken } from "@/utils";
-import router from "next/router";
+import router, { useRouter } from "next/router";
 
 const HANDLERS = {
   INITIALIZE: "INITIALIZE",
@@ -63,7 +63,7 @@ export const AuthProvider = (props: any) => {
   const { children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
   const initialized = useRef(false);
-
+  const local = useRouter();
   const initialize = async () => {
     // Prevent from calling twice in development mode with React.StrictMode enabled
     if (initialized.current) {
@@ -89,7 +89,9 @@ export const AuthProvider = (props: any) => {
           type: HANDLERS.INITIALIZE,
           payload: userInfo,
         });
-        router.push("/orderManagement");
+        if (local.pathname === "/") {
+          router.push("/orderManagement");
+        }
       } else {
         signOut();
       }

@@ -29,15 +29,15 @@ const Alert = forwardRef(function Alert(props: any, ref: any) {
   return <MuiAlert elevation={3} ref={ref} variant="filled" {...props} />;
 });
 
-const now = dayjs();
-const start = now.subtract(3, "day");
+const now = dayjs().startOf("day");
+const start = now.subtract(3, "day").format("YYYY/MM/DD");
 
 const Page = () => {
   const [datagridData, setDatagridData] = useState<any>([]);
   // 开始时间
   const [startDate, setStartDate] = useState<any>(start);
   // 结束时间
-  const [endDate, setEndDate] = useState<any>(now);
+  const [endDate, setEndDate] = useState<any>(now.format("YYYY/MM/DD"));
   // 报错弹窗信息
   const [alertState, setAlertState] = useState<any>({
     open: false,
@@ -147,7 +147,7 @@ const Page = () => {
           editable: true,
           required: true,
           preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-            const hasError = /^\d+$/.test(params.props.value);
+            const hasError = /^\d+(\.\d{1,2})?$/.test(params.props.value);
             return { ...params.props, error: !hasError };
           },
           valueFormatter: ({ value }: any) => {
@@ -163,7 +163,7 @@ const Page = () => {
               return value;
             }
           },
-          regex: /^\d+$/,
+          regex: /^\d+(\.\d{1,2})?$/,
           errorMsg: "请输入正确的格式",
         },
       ];
@@ -251,7 +251,7 @@ const Page = () => {
                           });
                           return;
                         }
-                        setStartDate(newValue);
+                        setStartDate(newValue.format("YYYY/MM/DD"));
                       }}
                       renderInput={(params) => <TextField {...params} />}
                     />
@@ -267,7 +267,7 @@ const Page = () => {
                           });
                           return;
                         }
-                        setEndDate(newValue);
+                        setEndDate(newValue.format("YYYY/MM/DD"));
                       }}
                       renderInput={(params) => <TextField {...params} />}
                     />

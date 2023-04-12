@@ -23,10 +23,10 @@ export function queryRefundEnum() {
 }
 
 /**
- * 角色等级枚举获取
+ * 角色枚举获取
  * @param params
  * @returns
  */
-export function queryRoleScopeEnum() {
-  return myAxios.get(generateRequestUrl("queryRoleScopeEnum"));
+export function queryRoleEnum() {
+  return myAxios.get(generateRequestUrl("queryRoleEnum"));
 }

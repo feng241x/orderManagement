@@ -19,6 +19,7 @@ import { deptList } from "@/api/dept";
 import LockResetSharpIcon from "@mui/icons-material/LockResetSharp";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import ToggleOnIcon from "@mui/icons-material/ToggleOn";
+import { queryRoleEnum } from "@/api/enumCommon";
 
 const Alert = forwardRef(function Alert(props: any, ref: any) {
   return <MuiAlert elevation={3} ref={ref} variant="filled" {...props} />;
@@ -70,8 +71,8 @@ const Page = () => {
           });
         });
     };
-    // 在这里调用 rootPassword 函数
-    deptList().then((deptDataList: any) => {
+    Promise.all([queryRoleEnum(), deptList()]).then((result) => {
+      const [queryRoleDataList, deptDataList]: any = result;
       // 定义列属性
       const defaultColumnsFields = [
         {
@@ -89,6 +90,13 @@ const Page = () => {
         {
           field: "deptId",
           headerName: "部门名称",
+          editable: true,
+          width: 150,
+          type: "singleSelect",
+        },
+        {
+          field: "roleId",
+          headerName: "角色",
           editable: true,
           width: 150,
           type: "singleSelect",
@@ -190,21 +198,32 @@ const Page = () => {
           label: item["deptName"],
         })),
       });
+      // 更新角色枚举
+      const queryRoleScopeEnum: any = defaultColumnsFields.find(
+        (item) => item["field"] === "roleId"
+      );
+      Object.assign(queryRoleScopeEnum, {
+        valueOptions: queryRoleDataList?.map((item: any) => ({
+          value: item["code"],
+          label: item["name"],
+        })),
+      });
       setColumnsFields(defaultColumnsFields);
     });
+    // 在这里调用 rootPassword 函数
   }, [alertState]);
   // 更新编辑行数据
   const onChangeRowData = async (newData: any) => {
     return await editUser(newData);
   };
-  // 新增订单
+  // 新增
   const onAddRowData = (data: any) => {
     return addUser(data).then((result) => {
       setDatagridData(datagridData.concat([result]));
       return true;
     });
   };
-  // 删除订单
+  // 删除
   const onDelHandle = (ids: number[]) => {
     return batchDelUser(ids.join(","))
       .then((result) => {
@@ -250,47 +269,6 @@ const Page = () => {
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={3}>
                 <Typography variant="h4">用户管理</Typography>
-                <Stack alignItems="center" direction="row" spacing={3}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"zh-cn"}>
-                    <DatePicker
-                      label="开始时间"
-                      value={startDate}
-                      onChange={(newValue: any) => {
-                        if (dayjs(newValue).diff(endDate) > 0) {
-                          setAlertState({
-                            ...alertState,
-                            open: true,
-                            severity: "error",
-                            message: "开始时间不能大于结束时间!",
-                          });
-                          return;
-                        }
-                        setStartDate(newValue);
-                      }}
-                      renderInput={(params) => <TextField {...params} />}
-                    />
-                    <DatePicker
-                      label="结束时间"
-                      value={endDate}
-                      onChange={(newValue: any) => {
-                        if (dayjs(newValue).diff(startDate) < 0) {
-                          setAlertState({
-                            ...alertState,
-                            open: true,
-                            severity: "error",
-                            message: "结束时间不能小于开始时间!",
-                          });
-                          return;
-                        }
-                        setEndDate(newValue);
-                      }}
-                      renderInput={(params) => <TextField {...params} />}
-                    />
-                    {/* <Button onClick={searchDataHandle} color="primary" variant="contained">
-                      查询
-                    </Button> */}
-                  </LocalizationProvider>
-                </Stack>
               </Stack>
             </Stack>
             <EditDataGrid

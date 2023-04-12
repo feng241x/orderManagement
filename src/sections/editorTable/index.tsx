@@ -144,7 +144,7 @@ export default function EditDataGrid(opts: EditDataGridProp) {
       errors: any = {};
     columnsFields.forEach((item: any) => {
       inputValues[item["field"]] = "";
-      errors[item["field"]] = item["errorMsg"];
+      errors[item["field"]] = item["required"] && item["errorMsg"];
     });
     setInputValues(inputValues);
     setErrors(errors);
@@ -195,6 +195,7 @@ export default function EditDataGrid(opts: EditDataGridProp) {
 
   // 提交新建表单
   const onSubmit = async (data: any) => {
+    if (Object.values(errors).every((item) => item == "")) return;
     const result = await onAddRowData(inputValues);
     if (result) {
       // 新建成功 关闭弹窗
@@ -378,7 +379,17 @@ export default function EditDataGrid(opts: EditDataGridProp) {
                 .map((column: any) => {
                   const field = column["field"];
                   return (
-                    <Grid item xs={6} key={field}>
+                    <Grid
+                      item
+                      xs={
+                        columnsFields.filter((column) => {
+                          return column["editable"];
+                        }).length > 6
+                          ? 6
+                          : 24
+                      }
+                      key={field}
+                    >
                       <TextField
                         label={column["headerName"]}
                         select={column.hasOwnProperty("valueOptions")}
