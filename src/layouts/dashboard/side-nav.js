@@ -28,7 +28,7 @@ export const SideNav = (props) => {
   const [routerItems, setRouterItems] = useState(items);
   useEffect(() => {
     setRouterItems(
-      routerItems.filter((item) => {
+      items.filter((item) => {
         switch (user.roleId) {
           // 管理员
           case 1:
@@ -51,7 +51,7 @@ export const SideNav = (props) => {
         }
       })
     );
-  }, []);
+  }, [user.roleId]);
   const content = (
     <Scrollbar
       sx={{
