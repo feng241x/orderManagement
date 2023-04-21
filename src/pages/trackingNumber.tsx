@@ -33,6 +33,7 @@ const now = dayjs().startOf("day");
 const start = now.subtract(3, "day").format("YYYY/MM/DD");
 
 const Page = () => {
+  debugger;
   const [datagridData, setDatagridData] = useState<any>([]);
   // 开始时间
   const [startDate, setStartDate] = useState<any>(start);
