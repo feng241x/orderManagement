@@ -5,8 +5,8 @@ import axios from "axios";
 import router from "next/router";
 /** 全局默认的axios实例 */
 export const myAxios = axios.create({
-  baseURL: "http://pjdyw.cn:8080/",
-  // baseURL: "http://localhost:8080/",
+  // baseURL: "http://pjdyw.cn:8080/",
+  baseURL: "http://localhost:8080/",
 });
 
 /** token header */

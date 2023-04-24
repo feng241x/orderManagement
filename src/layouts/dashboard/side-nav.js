@@ -24,10 +24,10 @@ export const SideNav = (props) => {
   const { open, onClose } = props;
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-  const { user } = useAuthContext();
+  const { user = { roleId: -1 } } = useAuthContext();
   const [routerItems, setRouterItems] = useState(items);
   useEffect(() => {
-    if (!user) return;
+    if (user.roleId === -1) return;
     setRouterItems(
       items.filter((item) => {
         switch (user.roleId) {
@@ -52,7 +52,7 @@ export const SideNav = (props) => {
         }
       })
     );
-  }, [user?.roleId]);
+  }, [user.roleId]);
   const content = (
     <Scrollbar
       sx={{
