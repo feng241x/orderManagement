@@ -36,15 +36,15 @@ export const SideNav = (props) => {
             // 管理员账号可以查看所有页面
             return true;
           // 数据员
-          case 28:
+          case 4:
           // 部门主管
-          case 29:
+          case 3:
           // 普通用户
-          case 30:
+          case 2:
             // 只能查看订单管理页面
             return ["/orderManagement", "/account"].includes(item["path"]);
           // 仓管
-          case 31:
+          case 5:
             // 只能查看订单管理页面
             return ["/trackingNumber", "/account"].includes(item["path"]);
           default:
