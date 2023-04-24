@@ -27,6 +27,8 @@ export const SideNav = (props) => {
   const { user } = useAuthContext();
   const [routerItems, setRouterItems] = useState(items);
   useEffect(() => {
+    debugger;
+    if (!user) return;
     setRouterItems(
       items.filter((item) => {
         switch (user.roleId) {
@@ -51,7 +53,7 @@ export const SideNav = (props) => {
         }
       })
     );
-  }, [user.roleId]);
+  }, [user?.roleId]);
   const content = (
     <Scrollbar
       sx={{
