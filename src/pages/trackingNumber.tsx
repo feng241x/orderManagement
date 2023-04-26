@@ -33,7 +33,6 @@ const now = dayjs().startOf("day");
 const start = now.subtract(3, "day").format("YYYY/MM/DD");
 
 const Page = () => {
-  debugger;
   const [datagridData, setDatagridData] = useState<any>([]);
   // 开始时间
   const [startDate, setStartDate] = useState<any>(start);
@@ -71,6 +70,7 @@ const Page = () => {
           minWidth: 300,
           editable: true,
           required: true,
+          flex: 6,
         },
         {
           field: "recycleStatus",
@@ -78,6 +78,7 @@ const Page = () => {
           valueOptions: [],
           minWidth: 200,
           type: "singleSelect",
+          flex: 6,
           renderCell: ({ value }: any) => (
             <Chip
               label={result.find((item: any) => item["code"] === value)["name"]}
@@ -90,12 +91,14 @@ const Page = () => {
           field: "createBy",
           headerName: "录入人",
           minWidth: 200,
+          flex: 6,
         },
         {
           field: "createTime",
           headerName: "录入时间",
           minWidth: 200,
           type: "dateTime",
+          flex: 6,
           valueFormatter: ({ value }: any) => value && dayjs(value).format("YYYY/MM/DD HH:mm"),
         },
       ];

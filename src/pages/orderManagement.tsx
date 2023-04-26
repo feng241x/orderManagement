@@ -71,36 +71,43 @@ const Page = () => {
           minWidth: 100,
           editable: true,
           required: true,
+          flex: 2,
         },
         {
           field: "zfbNum",
           headerName: "支付宝账号",
           editable: true,
+          flex: 2,
         },
         {
           field: "zfbUser",
           headerName: "支付宝户主",
           editable: true,
+          flex: 2,
         },
         {
           field: "accountNum",
           headerName: "平台账号",
           editable: true,
+          flex: 2,
         },
         {
           field: "wxNum",
           headerName: "微信号",
           editable: true,
+          flex: 2,
         },
         {
           field: "trackingNum",
           headerName: "物流单号",
           editable: true,
+          flex: 2,
         },
         {
           field: "promoteProduct",
           headerName: "推广产品",
           editable: true,
+          flex: 2,
         },
         {
           field: "recycleStatus",
@@ -108,6 +115,7 @@ const Page = () => {
           minWidth: 120,
           editable: true,
           type: "singleSelect",
+          flex: 2,
           renderCell: ({ value }: any) => (
             <Chip
               label={recyclesEnum.find((item: any) => item["code"] === value)["name"]}
@@ -122,6 +130,7 @@ const Page = () => {
           minWidth: 120,
           editable: true,
           type: "singleSelect",
+          flex: 2,
           renderCell: ({ value }: any) => (
             <Chip
               label={refundEnum.find((item: any) => item["code"] === value)["name"]}
@@ -133,12 +142,14 @@ const Page = () => {
         {
           field: "promoter",
           headerName: "推广人",
+          flex: 2,
         },
         {
           field: "createTime",
           headerName: "创建时间",
           minWidth: 150,
           type: "dateTime",
+          flex: 2,
           valueFormatter: ({ value }: any) => value && dayjs(value).format("YYYY/MM/DD HH:mm"),
         },
         {
@@ -146,6 +157,7 @@ const Page = () => {
           headerName: "金额",
           editable: true,
           required: true,
+          flex: 2,
           preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
             const hasError = /^\d+(\.\d{1,2})?$/.test(params.props.value);
             return { ...params.props, error: !hasError };

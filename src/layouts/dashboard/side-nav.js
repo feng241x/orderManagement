@@ -1,8 +1,6 @@
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import PropTypes from "prop-types";
-import ArrowTopRightOnSquareIcon from "@heroicons/react/24/solid/ArrowTopRightOnSquareIcon";
-import ChevronUpDownIcon from "@heroicons/react/24/solid/ChevronUpDownIcon";
 import {
   Box,
   Button,
@@ -23,7 +21,8 @@ import { useEffect, useState } from "react";
 export const SideNav = (props) => {
   const { open, onClose } = props;
   const pathname = usePathname();
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  // const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  const lgUp = false;
   const { user = { roleId: -1 } } = useAuthContext();
   const [routerItems, setRouterItems] = useState(items);
   useEffect(() => {
@@ -149,7 +148,8 @@ export const SideNav = (props) => {
     return (
       <Drawer
         anchor="left"
-        open
+        onClose={onClose}
+        open={open}
         PaperProps={{
           sx: {
             backgroundColor: "neutral.800",
@@ -176,8 +176,8 @@ export const SideNav = (props) => {
           width: 280,
         },
       }}
-      sx={{ zIndex: (theme) => theme.zIndex.appBar + 100 }}
-      variant="temporary"
+      // sx={{ zIndex: (theme) => theme.zIndex.appBar + 100 }}
+      variant="persistent"
     >
       {content}
     </Drawer>
